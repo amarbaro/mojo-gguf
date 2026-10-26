@@ -1,0 +1,19 @@
+$ scripts/ci.sh
+Resolved 33 packages in 0.97ms
+Checked 29 packages in 0.37ms
+oracle python 3.14.8
+llama.cpp at pin 1744c6bde8d687ce9774b3b54e688eee0bfdf5b7
+ok   fixtures-ggml: PASS ggml fixtures -> .work/oracle/ggml
+ok   core: PASS 18/18
+ok   cmp-selftest: PASS 4/4
+ok   u2: PASS 6/6
+ok   u2-lookup: PASS 18527/18527 lookups equal gguf-py TensorNameMap
+ok   u9: PASS 6/6
+ok   u9-parity: PASS 24/24
+ok   naming: PASS 75/75 naming lines agree
+ok   u8-synth: PASS 31/31
+PASS ci
+
+real	1m52.988s
+user	3m14.420s
+sys	0m17.331s

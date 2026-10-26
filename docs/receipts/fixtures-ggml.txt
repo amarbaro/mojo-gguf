@@ -1,0 +1,2 @@
+$ scripts/ci.sh (step fixtures-ggml)
+PASS ggml fixtures -> .work/oracle/ggml

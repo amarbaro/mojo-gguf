@@ -1,0 +1,8 @@
+$ scripts/oracle-gates.sh (step u3)
+ok   llama-cpp-pinned
+ok   build
+     bf16: 0.26 s 34128 KB (oracle 12.55 s 2306112 KB)
+ok   bf16-identical
+     q8_0: 0.34 s 33984 KB (oracle 6.77 s 2100632 KB)
+ok   q8_0-identical
+PASS 4/4

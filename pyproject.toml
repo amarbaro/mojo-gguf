@@ -1,0 +1,14 @@
+[project]
+name = "mojo-gguf"
+version = "0.1.0"
+description = "GGUF tooling in Mojo, byte-identical with llama.cpp's converters, quantizer and gguf-py scripts"
+license = "Apache-2.0"
+requires-python = ">=3.11,<3.15"
+dependencies = [
+  "mojo>=1.1.0,<1.2",
+  "numpy>=2.0",
+  "pyyaml>=6.0",
+  "tqdm>=4.66",
+  "requests>=2.32",
+  "tokenizers>=0.21",
+]

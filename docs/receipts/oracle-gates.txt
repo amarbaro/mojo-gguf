@@ -1,0 +1,15 @@
+$ scripts/oracle-gates.sh
+ok   u1: PASS 12/12
+ok   u3: PASS 4/4
+ok   u4: PASS 10/10
+ok   u5: PASS 12/12
+ok   u6: PASS 3/3
+ok   u6-all-types: PASS extra types
+ok   u7: PASS 8/8
+ok   u7-extra: PASS 6/6
+ok   u8: PASS 3/3
+PASS oracle-gates
+
+real	3m4.941s
+user	3m38.615s
+sys	0m21.363s

@@ -1,0 +1,15 @@
+$ scripts/oracle-gates.sh (step u5)
+ok   llama-cpp-pinned
+ok   build
+ok   dump-q4k
+note: FLASH_GGUF not found, the tokenizer-array dump is not run
+ok   dump-json
+ok   dump-markdown
+ok   dump-offsets
+ok   hash-q4_0
+ok   hash-nolayer
+ok   set-int
+ok   set-missing-key
+ok   endian-big-q8
+ok   endian-big-q4k
+PASS 12/12

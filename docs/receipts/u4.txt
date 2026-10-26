@@ -1,0 +1,20 @@
+$ scripts/oracle-gates.sh (step u4)
+ok   llama-cpp-pinned
+ok   build
+     Q8_0: 0.82 s 49784 KB (oracle 1.06 s 1025984 KB)
+ok   Q8_0-identical
+     Q4_0: 0.51 s 41512 KB (oracle 0.78 s 959856 KB)
+ok   Q4_0-identical
+     Q4_K: 0.71 s 43580 KB (oracle 1.29 s 977000 KB)
+ok   Q4_K-identical
+     Q6_K: 0.87 s 50016 KB (oracle 1.15 s 1026672 KB)
+ok   Q6_K-identical
+     Q2_K: 0.61 s 41508 KB (oracle 1.17 s 960316 KB)
+ok   Q2_K-identical
+     Q2_0: 0.53 s 34844 KB (oracle 0.84 s 922836 KB)
+ok   Q2_0-identical
+     TQ1_0: 0.52 s 41640 KB (oracle 0.78 s 959904 KB)
+ok   TQ1_0-identical
+     TQ2_0: 0.55 s 41668 KB (oracle 0.77 s 959860 KB)
+ok   TQ2_0-identical
+PASS 10/10

@@ -1,0 +1,5 @@
+$ scripts/oracle-gates.sh (step u8)
+ok   llama-cpp-pinned
+ok   build
+ok   chkhsh-Models-qwen2.5-0.5b-instruct-hf
+PASS 3/3

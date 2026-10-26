@@ -1,0 +1,8 @@
+One-line mutants of the library, each run against tests/core-gate.sh (the source restored after each run):
+src/gguf/dequant.mojo   Q4_0 high nibble minus 8 -> minus 7              FAIL 1/18 dequant-8-types
+src/gguf/dequant.mojo   Q8_0 value * d -> value * d * 1.0000001          FAIL 1/18 dequant-8-types
+src/gguf/model.mojo     pad_to: (n + align - 1) -> (n + align)           FAIL 4/18 rewrite-tiny edit-tiny rewrite-tiny-a64 edit-tiny-a64
+src/gguf_tool.mojo      "* Dumping N tensor(s)" -> "* Dumpingx N ..."     FAIL 1/18 dump
+src/gguf/sha.mojo       SHA-1 constant 0x5A827999 -> 0x5A827998          FAIL 2/18 hash hash-no-layer
+All five killed. A sixth mutant, pad_to: (n + align - 1) -> (n + align - 2), survives: it differs only for sizes of 1 mod
+alignment, and gguf-py pads every tensor to the alignment, so the writer never sees such a size in these fixtures.

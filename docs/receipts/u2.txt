@@ -1,0 +1,8 @@
+$ scripts/ci.sh (step u2)
+ok   llama-cpp-pinned
+ok   generator-runs
+ok   generator-deterministic
+ok   committed-equals-generated
+ok   build
+ok   dump-equals-gguf-py
+PASS 6/6

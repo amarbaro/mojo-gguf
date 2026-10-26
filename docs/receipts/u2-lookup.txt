@@ -1,0 +1,2 @@
+$ scripts/ci.sh (step u2-lookup)
+PASS 18527/18527 lookups equal gguf-py TensorNameMap

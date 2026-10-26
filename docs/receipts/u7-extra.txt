@@ -1,0 +1,8 @@
+$ scripts/oracle-gates.sh (step u7-extra)
+ok   extra-f32-identical
+ok   extra-f16-identical
+ok   extra-bf16-identical
+ok   extra-q8_0-identical
+ok   dir-outfile-name
+ok   templated-outfile
+PASS 6/6

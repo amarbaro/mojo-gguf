@@ -1,0 +1,16 @@
+$ scripts/oracle-gates.sh (step u1)
+ok   rewrite-bf16
+ok   rewrite-q8_0-py
+ok   rewrite-Q8_0
+ok   rewrite-Q4_0
+ok   rewrite-Q4_K
+ok   rewrite-Q6_K
+ok   rewrite-Q2_K
+ok   rewrite-Q2_0
+ok   rewrite-TQ1_0
+ok   rewrite-TQ2_0
+note: FLASH_GGUF not found, the tokenizer-array cases are not run
+ok   summary-Q4_K
+ok   edit-Q4_K
+bf16 rewrite: 0.16 s 13568 KB (994 MB file)
+PASS 12/12

@@ -1,0 +1,32 @@
+$ scripts/ci.sh (step u9-parity)
+ok   llama-cpp-pinned
+ok   build
+ggjt2-f16.bin 232704 bytes
+ggjt1-f32.bin 462080 bytes
+ggjt2-q8_0.bin 125184 bytes
+ggml-f16.bin 232113 bytes
+ggmf1-f16.bin 232373 bytes
+ggjt3-f16-vocab300.bin 295968 bytes
+ok   fixtures
+ok   ggjt3-f16 default
+ok   ggmf1-f32 default
+ok   ggml-f32 default
+ok   ggjt2-f16 default
+ok   ggjt1-f32 default
+ok   ggml-f16 default
+ok   ggmf1-f16 default
+ok   ggjt3-f16-vocab300 default
+ok   ggjt2-q8_0 refused
+ok   ggjt3-f16 name+desc
+ok   ggjt3-f16 empty desc
+ok   ggjt3-f16 empty name
+ok   ggjt3-f16 gqa 2
+ok   ggjt3-f16 gqa 4
+ok   ggjt3-f16 gqa 3 refused
+ok   ggml-f16 eps 1e-6 ctx 4096
+ok   ggmf1-f16 eps=1e-5 -c 512
+ok   ggjt3-f16-vocab300 verbose
+ok   already GGUF refused
+ok   metadata dir not supported
+ok   vocab dir not supported
+PASS 24/24

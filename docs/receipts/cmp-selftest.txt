@@ -1,0 +1,2 @@
+$ scripts/ci.sh (step cmp-selftest)
+PASS 4/4

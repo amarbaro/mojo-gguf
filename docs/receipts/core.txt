@@ -1,0 +1,21 @@
+$ scripts/ci.sh (step core)
+ok   llama-cpp-pinned
+ok   rewrite-tiny
+ok   summary-tiny
+ok   edit-tiny
+ok   rewrite-tiny-a64
+ok   summary-tiny-a64
+ok   edit-tiny-a64
+ok   dump
+ok   dump-no-tensors
+ok   dump-json
+ok   dump-markdown
+ok   hash
+ok   hash-no-layer
+ok   set-int
+ok   set-missing
+ok   endian-big-tiny
+ok   endian-big-a64
+     8/8 types bit-equal
+ok   dequant-8-types
+PASS 18/18

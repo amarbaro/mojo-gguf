@@ -1,0 +1,33 @@
+$ scripts/oracle-gates.sh (step u6)
+ok   llama-cpp-pinned
+ok   build
+          Q8_0.gguf: types f32 q8_0
+          Q8_0.gguf: types f32 q8_0
+          Q4_0.gguf: types f32 q4_0
+          Q4_0.gguf: types f32 q4_0
+          Q4_K.gguf: types f32 q5_0 q4_K
+          Q4_K.gguf: types f32 q5_0 q4_K
+          Q4_K.gguf: types f32 q5_0 q4_K
+          Q6_K.gguf: types f32 q8_0 q6_K
+          Q6_K.gguf: types f32 q8_0 q6_K
+          Q6_K.gguf: types f32 q8_0 q6_K
+          Q2_K.gguf: types f32 q4_0 q2_K
+          Q2_K.gguf: types f32 q4_0 q2_K
+          Q2_K.gguf: types f32 q4_0 q2_K
+          Q2_0.gguf: types f32 q2_0
+          Q2_0.gguf: types f32 q2_0
+          TQ1_0.gguf: types f32 q4_0 tq1_0
+          TQ1_0.gguf: types f32 q4_0 tq1_0
+          TQ1_0.gguf: types f32 q4_0 tq1_0
+     ok   f32 14/14
+     ok   q2_0 12/12
+     ok   q2_K 12/12
+     ok   q4_0 36/36
+     ok   q4_K 12/12
+     ok   q5_0 12/12
+     ok   q6_K 12/12
+     ok   q8_0 24/24
+     ok   tq1_0 12/12
+     PASS 9/9 types
+ok   rows-bit-equal
+PASS 3/3

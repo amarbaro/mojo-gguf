@@ -1,0 +1,8 @@
+$ scripts/ci.sh (step u9)
+ok   llama-cpp-pinned
+ok   build
+ok   ggjt3-f16-identical
+ok   ggmf1-f32-identical
+ok   ggml-f32-identical
+ok   ggjt3-q8_0-refused-like-upstream
+PASS 6/6
