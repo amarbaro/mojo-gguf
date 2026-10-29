@@ -5,7 +5,7 @@ Each subcommand takes the script's argv and must match it: stdout byte for byte,
 command writes. Logging that the scripts send to stderr is not reproduced.
 """
 from std.ffi import c_ssize_t, external_call
-from std.io.file_descriptor import FileDescriptor
+from std.sys import stderr
 from std.memory import bitcast
 from std.sys import argv, exit
 from gguf.fmt import (
@@ -37,7 +37,7 @@ def has(items: List[String], s: String) -> Bool:
 
 
 def usage_error(cmd: String, msg: String):
-    print("gguf-tool " + cmd + ": error: " + msg, file=FileDescriptor(2))
+    print("gguf-tool " + cmd + ": error: " + msg, file=stderr)
     exit(2)
 
 
@@ -822,5 +822,5 @@ def main():
     try:
         run()
     except e:
-        print("FAIL gguf-tool: " + String(e), file=FileDescriptor(2))
+        print("FAIL gguf-tool: " + String(e), file=stderr)
         exit(1)
