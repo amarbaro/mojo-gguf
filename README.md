@@ -26,7 +26,7 @@ mojo build -I src src/quantize.mojo -o quantize
 
 ## Install
 
-Requires Mojo 1.1 (`uv sync` installs it) and Linux x86-64. Nothing else: every command builds with the `mojo`
+Requires Mojo 1.2 (`uv sync` installs it) and Linux x86-64. Nothing else: every command builds with the `mojo`
 package alone, no linker flags.
 
 | Way | Command |

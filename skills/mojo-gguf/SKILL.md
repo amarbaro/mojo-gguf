@@ -5,7 +5,7 @@ description: "Read, rewrite, quantize, convert and dequantize GGUF files from Mo
 
 # mojo-gguf
 
-GGUF tooling in Mojo 1.1. Each command is checked byte for byte (or bit for bit) against the pinned llama.cpp
+GGUF tooling in Mojo 1.2. Each command is checked byte for byte (or bit for bit) against the pinned llama.cpp
 (`1744c6bde`). Which gates run where is in `docs/gates.md`.
 
 ## Install
