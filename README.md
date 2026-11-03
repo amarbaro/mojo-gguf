@@ -1,6 +1,9 @@
 # mojo-gguf
 
-[![CI](https://github.com/amarbaro/mojo-gguf/actions/workflows/ci.yml/badge.svg)](https://github.com/amarbaro/mojo-gguf/actions/workflows/ci.yml)
+<!-- badges -->
+[![ci](https://github.com/amarbaro/mojo-gguf/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/amarbaro/mojo-gguf/actions/workflows/ci.yml) [![latest release](https://img.shields.io/github/v/release/amarbaro/mojo-gguf)](https://github.com/amarbaro/mojo-gguf/releases/latest) [![license](https://img.shields.io/github/license/amarbaro/mojo-gguf)](https://github.com/amarbaro/mojo-gguf/blob/main/LICENSE)
+<!-- /badges -->
+
 
 GGUF tools in Mojo that write the bytes llama.cpp's own tools write: a GGUF reader and writer, the four gguf-py
 scripts (`dump`, `hash`, `set-metadata`, `convert-endian`), the Qwen2 safetensors-to-GGUF converter, the LoRA and
