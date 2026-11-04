@@ -4,6 +4,8 @@
 # need Qwen2.5-0.5B, a llama.cpp build or the author's model files run locally: scripts/oracle-gates.sh.
 set -euo pipefail
 cd "$(dirname "$0")/.."
+v=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml); c=$(sed -n 's/^- \[v\([0-9.]*\)\].*/\1/p' CHANGELOG.md | head -1)
+[ "$v" = "$c" ] || { echo "FAIL version: pyproject $v vs newest CHANGELOG entry $c"; exit 1; }
 command -v uv >/dev/null || { echo "FAIL setup: uv not installed"; exit 1; }
 uv sync || { echo "FAIL setup: uv sync"; exit 1; }
 .venv/bin/python -c 'import platform; print("oracle python", platform.python_version())'
