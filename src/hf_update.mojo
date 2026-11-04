@@ -4,7 +4,7 @@ Prints `ntok N chkhsh H pre NAME`: the token count and sha256(str(ids)) of the c
 DIR/tokenizer.json (see hfconv.hftok), and its tokenizer.ggml.pre name from the table generated out of the pinned
 conversion/base.py by tools/gen-hf-table.py (`unknown` when the hash is not in it)."""
 from std.sys import argv, exit
-from gguf.sha import Sha256, hexdigest
+from ggufx.sha import Sha256, hexdigest
 from hfconv.hftok import encode_chktxt
 from hfconv.chk_table import pre_name
 

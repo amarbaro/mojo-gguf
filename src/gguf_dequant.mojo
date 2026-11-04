@@ -1,8 +1,8 @@
 """Gguf-dequant MODEL TENSOR ROW0 N OUT.f32: N rows of one tensor as little-endian f32, streamed in row chunks."""
 from std.sys import argv, exit
 from std.ffi import external_call, c_ssize_t
-from gguf.model import Gguf, open_fd, pread_into
-from gguf.dequant import quant_block, deq_rows
+from ggufx.model import Gguf, open_fd, pread_into
+from ggufx.dequant import quant_block, deq_rows
 
 comptime CHUNK = 16 << 20  # f32 output bytes per round trip: bounds memory whatever N is (source is smaller)
 

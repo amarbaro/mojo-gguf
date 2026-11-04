@@ -4,7 +4,7 @@
 # the pinned llama.cpp ggml.h enum. Scope input for U6 (dequant: every type on disk).
 # usage: type-census FILE.gguf...
 from std.sys import argv
-from gguf import Gguf
+from ggufx import Gguf
 
 
 def tname(t: Int) -> String:

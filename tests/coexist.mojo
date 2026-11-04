@@ -2,7 +2,7 @@
 # (FileHandle.seek declares lseek): a program that seeks a file and uses Gguf, Json and Shard must link.
 # coexist GGUF SAFETENSORS (tests/negative-gate.sh)
 from std.sys import argv
-from gguf import Gguf
+from ggufx import Gguf
 from st.json import Json
 from st.safetensors import Shard
 

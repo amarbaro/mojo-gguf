@@ -12,7 +12,7 @@ compared with llama.cpp pinned at `1744c6bde`: converter and quantizer outputs a
 Qwen2.5-0.5B-Instruct, dequantized rows are bit-equal to `ggml`'s `to_float`. Linux x86-64, CPU only.
 
 ```mojo
-from gguf import Gguf
+from ggufx import Gguf
 
 def main() raises:
     var g = Gguf("model.gguf")                       # header and tensor table only, no tensor data is read
@@ -36,8 +36,8 @@ Requires Mojo 1.2 (`uv sync` installs it) and Linux x86-64, no linker flags. The
 | Way | Command |
 |---|---|
 | A command | `mojo build -I path/to/mojo-gguf/src -I path/to/mojo-gguf/lib path/to/mojo-gguf/src/<command>.mojo -o <command>` |
-| The library | `mojo build -I path/to/mojo-gguf/src app.mojo`, then `from gguf import Gguf` |
-| Vendor | copy `src/gguf/` into your project |
+| The library | `mojo build -I path/to/mojo-gguf/src app.mojo`, then `from ggufx import Gguf` |
+| Vendor | copy `src/ggufx/` into your project |
 
 ## What you get
 
@@ -52,7 +52,7 @@ Requires Mojo 1.2 (`uv sync` installs it) and Linux x86-64, no linker flags. The
 | `ggml2gguf` | `convert_llama_ggml_to_gguf.py` | GGML, GGMF v1, GGJT v1 to v3 |
 | `hf-update` | the check in `convert_hf_to_gguf_update.py` | pre-tokenizer fingerprint of a local `tokenizer.json`, no Python |
 
-The generated tables (`src/gguf/consts.mojo`, `tensor_map.mojo`, `grids.mojo`) come from gguf-py and `ggml-common.h`
+The generated tables (`src/ggufx/consts.mojo`, `tensor_map.mojo`, `grids.mojo`) come from gguf-py and `ggml-common.h`
 through `tools/gen-tables.py` and `tools/gen-grids.sh`, and a gate fails when they drift. Commands and library calls
 are in [docs/api.md](docs/api.md); which gate checks what, where it runs and its last receipt is in
 [docs/gates.md](docs/gates.md).

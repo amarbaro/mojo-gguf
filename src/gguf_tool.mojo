@@ -8,13 +8,13 @@ from std.ffi import c_ssize_t, external_call
 from std.sys import stderr
 from std.memory import bitcast
 from std.sys import argv, exit
-from gguf.fmt import (
+from ggufx.fmt import (
     cp_len, cp_slice, fixed, json_str, ljust, py_repr, py_title, rep, rjust, round_half_even, sub_str,
 )
-from gguf.model import Gguf, open_fd, pread_into, T_ARRAY, T_STRING, fixed_size
-from gguf.quant import row, tensor_bytes
-from gguf.sha import Sha1, Sha256, hexdigest
-from gguf.values import M_JSON, M_NP, M_PY, emit, end_at, leaf, read_str, type_name, uint_at
+from ggufx.model import Gguf, open_fd, pread_into, T_ARRAY, T_STRING, fixed_size
+from ggufx.quant import row, tensor_bytes
+from ggufx.sha import Sha1, Sha256, hexdigest
+from ggufx.values import M_JSON, M_NP, M_PY, emit, end_at, leaf, read_str, type_name, uint_at
 
 comptime CHUNK = 1 << 20
 comptime T_UINT64 = 10

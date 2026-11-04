@@ -16,7 +16,7 @@ from std.sys import argv, exit
 from std.ffi import external_call, c_ssize_t
 from std.os.path import exists, isdir
 from std.memory import bitcast
-from gguf.model import Out, pad_to, CHUNK
+from ggufx.model import Out, pad_to, CHUNK
 from st.json import Json
 from st.safetensors import Checkpoint, ST_F32
 from hfconv.qwen2_names import qwen2_name

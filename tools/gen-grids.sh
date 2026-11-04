@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Regenerate src/gguf/grids.mojo: the codebook tables of ggml-common.h (pinned llama.cpp) that the IQ dequant rows
-# index. usage: tools/gen-grids.sh [GGML_COMMON_H]   (writes src/gguf/grids.mojo, shell + awk only)
+# Regenerate src/ggufx/grids.mojo: the codebook tables of ggml-common.h (pinned llama.cpp) that the IQ dequant rows
+# index. usage: tools/gen-grids.sh [GGML_COMMON_H]   (writes src/ggufx/grids.mojo, shell + awk only)
 set -euo pipefail
 H=${1:-${LLAMACPP:-.work/llama.cpp}/ggml/src/ggml-common.h}
-OUT=$(dirname "$0")/../src/gguf/grids.mojo
+OUT=$(dirname "$0")/../src/ggufx/grids.mojo
 tbl() {  # name -> comma-joined values of GGML_TABLE_BEGIN(type, name, n) .. GGML_TABLE_END
   awk -v n="$1" '$0 ~ "GGML_TABLE_BEGIN\\(.*, " n "," {on=1; next} on && /GGML_TABLE_END/ {exit} on' "$H" |
     grep -o '0x[0-9a-f]*\|-\?[0-9]\+' | paste -sd, | sed 's/,/, /g'

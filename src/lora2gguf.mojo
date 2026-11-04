@@ -18,7 +18,7 @@ Rules ported from the script, in the order it applies them:
 from std.sys import argv, exit
 from std.ffi import external_call, c_ssize_t
 from std.os.path import exists, isdir
-from gguf.model import pad_to, CHUNK, open_fd, pread_into
+from ggufx.model import pad_to, CHUNK, open_fd, pread_into
 from st.json import Json
 from st.safetensors import Shard, StTensor, check_tensor, dtype_code, ST_F32
 from hfconv.naming import components, size_label, id_to_title

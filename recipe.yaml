@@ -13,7 +13,7 @@ source:
 build:
   number: 0
   script:
-    - mojo precompile src/gguf -I ${{ PREFIX }}/lib/mojo -o ${{ PREFIX }}/lib/mojo/gguf.mojoc
+    - mojo precompile src/ggufx -I ${{ PREFIX }}/lib/mojo -o ${{ PREFIX }}/lib/mojo/ggufx.mojoc
     - mojo precompile src/hfconv -I ${{ PREFIX }}/lib/mojo -o ${{ PREFIX }}/lib/mojo/hfconv.mojoc
     - mojo precompile src/st -I ${{ PREFIX }}/lib/mojo -o ${{ PREFIX }}/lib/mojo/st.mojoc
 

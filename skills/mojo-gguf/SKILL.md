@@ -16,7 +16,7 @@ scripts/deps.sh                                    # mojo-uregex into lib/
 mojo build -I src -I lib src/hf2gguf.mojo -o hf2gguf # any command: src/<name>.mojo
 ```
 
-As a library: `mojo build -I <repo>/src app.mojo`, then `from gguf import Gguf`.
+As a library: `mojo build -I <repo>/src app.mojo`, then `from ggufx import Gguf`.
 
 ## Use
 
@@ -31,7 +31,7 @@ ggml2gguf --input IN --output OUT
 ```
 
 ```mojo
-from gguf import Gguf
+from ggufx import Gguf
 
 def main() raises:
     var g = Gguf("model.gguf")
@@ -49,7 +49,7 @@ def main() raises:
   fallbacks), norms and biases are copied. It is not the mixed recipe of `llama-quantize Q4_K_M`.
 - `gguf-tool` and the converters match the Python scripts on stdout, exit code and written bytes, including their
   quirks; `ggml2gguf` refuses a GGJT Q8_0 file because the script does.
-- Never edit `src/gguf/consts.mojo`, `tensor_map.mojo` or `grids.mojo`: regenerate with `tools/gen-tables.py` and
+- Never edit `src/ggufx/consts.mojo`, `tensor_map.mojo` or `grids.mojo`: regenerate with `tools/gen-tables.py` and
   `tools/gen-grids.sh`.
 - A change is done when `scripts/ci.sh` prints `PASS ci`; the converter, quantizer and dequant gates need
   `scripts/oracle-gates.sh` (a llama.cpp build at the pin, Python with torch, Qwen2.5-0.5B-Instruct).

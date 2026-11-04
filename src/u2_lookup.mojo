@@ -1,7 +1,7 @@
 """Verifier CLI: u2-lookup CASES runs one map_tensor_name per line of CASES (tab-separated: arch, n_blocks, hf_name); prints one line each,
 the GGUF name or an empty line when unmapped. Verifier for tests/u2-lookup-check.py, not a converter entry point."""
 from std.sys import argv, exit
-from gguf.tensor_lookup import map_tensor_name
+from ggufx.tensor_lookup import map_tensor_name
 
 
 def run() raises:

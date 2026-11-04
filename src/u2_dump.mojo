@@ -3,9 +3,9 @@
 Every value comes from the generated tables (gguf/consts.mojo, gguf/tensor_map.mojo) through gguf/tensor_lookup.mojo.
 No trailing newline, as json.dump writes none.
 """
-from gguf.consts import value_types, quant_types, quant_sizes, arch_names, tensor_names, arch_tensors, gguf_keys
-from gguf.tensor_map import mapped_arches
-from gguf.tensor_lookup import expand_rows
+from ggufx.consts import value_types, quant_types, quant_sizes, arch_names, tensor_names, arch_tensors, gguf_keys
+from ggufx.tensor_map import mapped_arches
+from ggufx.tensor_lookup import expand_rows
 
 
 def quote(s: String) -> String:

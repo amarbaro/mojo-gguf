@@ -1,4 +1,4 @@
-"""Generate src/gguf/nonprint.mojo: the code point ranges str.isprintable() rejects, which repr() escapes.
+"""Generate src/ggufx/nonprint.mojo: the code point ranges str.isprintable() rejects, which repr() escapes.
 
     gen-nonprint.py OUT.mojo        (run with the oracle python, .venv/bin/python: its Unicode version is the reference)
 

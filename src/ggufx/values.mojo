@@ -7,8 +7,8 @@ Three dialects, one walker:
 """
 from std.math import isinf, isnan
 from std.memory import bitcast
-from gguf.model import Gguf, T_ARRAY, T_STRING, fixed_size, pread_into
-from gguf.fmt import json_str, np_float32, py_repr
+from ggufx.model import Gguf, T_ARRAY, T_STRING, fixed_size, pread_into
+from ggufx.fmt import json_str, np_float32, py_repr
 
 comptime T_INT8 = 1
 comptime T_INT16 = 3

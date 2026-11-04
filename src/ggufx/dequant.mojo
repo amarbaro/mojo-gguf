@@ -7,8 +7,8 @@ IEEE f32 op. `deq_rows` splits the rows over threads; codebooks are materialized
 """
 from std.collections import Array
 from std.memory import bitcast
-from gguf.par import parallelize
-from gguf.grids import IQ2XXS_GRID, IQ1S_GRID, KVALUES_IQ4NL
+from ggufx.par import parallelize
+from ggufx.grids import IQ2XXS_GRID, IQ1S_GRID, KVALUES_IQ4NL
 
 comptime Src = Pointer[UInt8, MutUntrackedOrigin]
 comptime Dst = Pointer[Float32, MutUntrackedOrigin]

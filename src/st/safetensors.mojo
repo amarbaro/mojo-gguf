@@ -5,7 +5,7 @@ shard), so a streaming consumer reproduces its tensor order. Nothing is copied: 
 from std.ffi import external_call
 from std.os import listdir
 from std.os.path import exists
-from gguf.model import open_fd, pread_into
+from ggufx.model import open_fd, pread_into
 from .json import Json
 
 comptime ST_F32 = 0

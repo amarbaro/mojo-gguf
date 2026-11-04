@@ -24,7 +24,7 @@ scaling, MoE keys, source dtypes other than BF16, F16 and F32, tokenizers withou
 
 ## Library
 
-`from gguf import Gguf` (add `-I src`).
+`from ggufx import Gguf` (add `-I src`).
 
 | Call | Behaviour |
 |---|---|
@@ -35,20 +35,20 @@ scaling, MoE keys, source dtypes other than BF16, F16 and F32, tokenizers withou
 | `g.summary()` | `kv K tensors T alignment A data_offset D`, the same numbers gguf-py's `GGUFReader` reports. |
 | `g.rewrite(out_path, name, remove)` | Writes the model. With no edit (`name` empty, `remove` empty) the layout is the source's. |
 
-`from gguf.dequant import deq_rows, quant_block`
+`from ggufx.dequant import deq_rows, quant_block`
 
 | Call | Behaviour |
 |---|---|
 | `quant_block(t)` | `(elements, bytes)` of one block of ggml type `t`; `(0, 0)` when there is no dequantizer. |
 | `deq_rows(t, src, ne0, nrows, dst)` | Dequantizes `nrows` contiguous rows of `ne0` elements into `nrows * ne0` f32, rows split over threads. Each f32 is the C reference's operation in the C reference's order. Raises on an unsupported type or a row that is not a whole number of blocks. |
 
-`from gguf.tensor_lookup import map_tensor_name`
+`from ggufx.tensor_lookup import map_tensor_name`
 
 | Call | Behaviour |
 |---|---|
 | `map_tensor_name(arch, n_blocks, hf_name)` | GGUF name for an HF tensor name (no `.weight` suffix) in `arch`, or an empty string. Tables come from gguf-py's `TensorNameMap` through `tools/gen-tables.py`. |
 
-`from gguf.par import parallelize`
+`from ggufx.par import parallelize`
 
 | Call | Behaviour |
 |---|---|
@@ -56,6 +56,6 @@ scaling, MoE keys, source dtypes other than BF16, F16 and F32, tokenizers withou
 
 ## Generated files
 
-`src/gguf/consts.mojo` and `src/gguf/tensor_map.mojo` are written by `tools/gen-tables.py GGUFPY OUT_DIR` from the
-pinned gguf-py, and `src/gguf/grids.mojo` by `tools/gen-grids.sh` from the pinned `ggml-common.h`. Do not edit them:
+`src/ggufx/consts.mojo` and `src/ggufx/tensor_map.mojo` are written by `tools/gen-tables.py GGUFPY OUT_DIR` from the
+pinned gguf-py, and `src/ggufx/grids.mojo` by `tools/gen-grids.sh` from the pinned `ggml-common.h`. Do not edit them:
 `tests/u2-gate.sh` fails when the committed files differ from a fresh generation.

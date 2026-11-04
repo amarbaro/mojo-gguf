@@ -2,7 +2,7 @@
 decode only what the caller asks for. `member` / `element` walk a container and skip each value
 they hand back, so a 6 MB tokenizer.json costs its bytes plus the strings actually decoded."""
 from std.ffi import external_call
-from gguf.model import open_fd, pread_into
+from ggufx.model import open_fd, pread_into
 
 comptime QUOTE = 34
 comptime BACKSLASH = 92

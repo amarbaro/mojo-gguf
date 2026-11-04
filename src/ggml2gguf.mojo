@@ -12,9 +12,9 @@ Not ported: a tensor whose data runs past the end of the input (the script write
 from std.sys import argv, exit
 from std.ffi import external_call
 from std.memory import bitcast
-from gguf.model import Out, open_fd, pread_into, pad_to, refuse_same_file
-from gguf.quant import row, tensor_bytes
-from gguf.tensor_lookup import map_tensor_name
+from ggufx.model import Out, open_fd, pread_into, pad_to, refuse_same_file
+from ggufx.quant import row, tensor_bytes
+from ggufx.tensor_lookup import map_tensor_name
 
 comptime MAGIC = 0x46554747
 comptime ALIGN = 32

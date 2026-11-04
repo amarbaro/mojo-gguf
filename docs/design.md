@@ -1,7 +1,8 @@
 # Design
 
 ## Layout
-- `src/gguf/`: the GGUF reader and writer (`model.mojo`), value decoding (`values.mojo`), the ggml type tables and dequantizers (`quant.mojo`,
+- `src/ggufx/` (named apart from mojo-gguf-core's `gguf`, so both install in one env; this reader streams a pread
+  window and reads big-endian files, which gguf-core refuses): the GGUF reader and writer (`model.mojo`), value decoding (`values.mojo`), the ggml type tables and dequantizers (`quant.mojo`,
   `dequant.mojo`, `quants.mojo`), the quantizer grids, `sha.mojo` for `hash`, and `fmt.mojo` for the text of `dump`.
 - `src/st/`: safetensors (every shard mmapped read-only) and the JSON reader for its headers and for
   `tokenizer.json`. `src/hfconv/`: the Hugging Face to GGUF rules (tensor naming, f16/bf16, tokenizer). The pre-tokenizer

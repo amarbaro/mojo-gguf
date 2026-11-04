@@ -7,10 +7,10 @@ quantized on all cores; norm and bias tensors are copied.
 from std.ffi import external_call, c_ssize_t
 from std.memory import bitcast
 from std.sys import argv, exit, num_logical_cores
-from gguf.par import parallelize
-from gguf import Gguf
-from gguf.model import Out, T_STRING, pad_to, pread_into, refuse_same_file
-from gguf.quants import (FP, BP, T_F32, T_F16, T_BF16, T_Q4_0, T_Q5_0, T_Q8_0, T_Q2_K, T_Q4_K, T_Q6_K,
+from ggufx.par import parallelize
+from ggufx import Gguf
+from ggufx.model import Out, T_STRING, pad_to, pread_into, refuse_same_file
+from ggufx.quants import (FP, BP, T_F32, T_F16, T_BF16, T_Q4_0, T_Q5_0, T_Q8_0, T_Q2_K, T_Q4_K, T_Q6_K,
                          T_TQ1_0, T_TQ2_0, T_Q2_0, QK_K, blck, row_size, quantize_row)
 
 comptime SLAB = 16 << 20

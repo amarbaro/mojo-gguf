@@ -1,6 +1,6 @@
 """Open a GGUF file and print its summary, whether a key exists, and the tensor table. usage: quickstart FILE.gguf"""
 from std.sys import argv
-from gguf import Gguf
+from ggufx import Gguf
 
 
 def main() raises:

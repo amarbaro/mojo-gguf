@@ -1,7 +1,7 @@
 """Gguf-rewrite IN OUT [--name STR] [--remove KEY]...: parse a GGUF, serialize it again."""
 from std.sys import argv, exit
-from gguf import Gguf
-from gguf.model import refuse_same_file
+from ggufx import Gguf
+from ggufx.model import refuse_same_file
 
 def run() raises:
     var a = argv()

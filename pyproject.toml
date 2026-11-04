@@ -11,5 +11,5 @@ dependencies = ["mojo>=1.2.0,<1.3"]
 dev = ["numpy>=2.0", "pyyaml>=6.0", "tqdm>=4.66", "requests>=2.32", "tokenizers>=0.21"]
 
 [tool.mojo]
-packages = ["gguf", "hfconv", "st"]  # one conda package carries all three .mojoc files
+packages = ["ggufx", "hfconv", "st"]  # one conda package carries all three .mojoc files
 deps = ["mojo-uregex"]  # pinned for source builds in scripts/deps.sh

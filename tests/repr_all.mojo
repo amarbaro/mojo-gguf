@@ -1,6 +1,6 @@
 # repr_all: py_repr(chr(cp)) for every code point but the surrogates, one line each (tests/negative-gate.sh compares
 # with Python's repr).
-from gguf.fmt import py_repr
+from ggufx.fmt import py_repr
 
 
 def main():
