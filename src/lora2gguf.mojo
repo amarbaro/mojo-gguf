@@ -20,7 +20,7 @@ from std.ffi import external_call, c_ssize_t
 from std.os.path import exists, isdir
 from gguf.model import pad_to, CHUNK, open_fd, pread_into
 from st.json import Json
-from st.safetensors import Shard, StTensor, dtype_code, ST_F32
+from st.safetensors import Shard, StTensor, check_tensor, dtype_code, ST_F32
 from hfconv.naming import components, size_label, id_to_title
 from hfconv.quant import emit_f32, emit_bf16, emit_q8_0
 from hfconv.f16 import emit_f16
@@ -80,9 +80,9 @@ struct Adapter(Movable):
             var off = j.open(j.get(v, "data_offsets"))
             var lo = j.integer(j.element(off))
             var hi = j.integer(j.element(off))
-            if 8 + n + hi > self.shard.size:
-                raise Error(path + ": tensor " + name + " runs past the end of the file")
-            var t = StTensor(name.copy(), dtype_code(j.get_string(v, "dtype")), shape^, 0, 8 + n + lo, hi - lo)
+            var dt = dtype_code(j.get_string(v, "dtype"))
+            check_tensor(path, name, dt, shape, lo, hi, 8 + n, self.shard.size)
+            var t = StTensor(name.copy(), dt, shape^, 0, 8 + n + lo, hi - lo)
             var at = len(self.tensors)
             for k in range(len(self.tensors)):
                 if t.begin < self.tensors[k].begin:
