@@ -12,7 +12,8 @@ GGUF tooling in Mojo 1.2. Each command is checked byte for byte (or bit for bit)
 
 ```
 git clone <repo> && cd mojo-gguf && uv sync
-mojo build -I src src/hf2gguf.mojo -o hf2gguf        # any command: src/<name>.mojo
+scripts/deps.sh                                    # mojo-uregex into lib/
+mojo build -I src -I lib src/hf2gguf.mojo -o hf2gguf # any command: src/<name>.mojo
 ```
 
 As a library: `mojo build -I <repo>/src app.mojo`, then `from gguf import Gguf`.

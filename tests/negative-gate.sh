@@ -11,7 +11,7 @@ check llama-cpp-pinned pinned
 W=$PWD/.work/neg; rm -rf "$W"; mkdir -p "$W"
 export LLAMACPP
 for t in gguf_rewrite:gguf-rewrite quantize:quantize gguf_tool:gguf-tool ggml2gguf:ggml2gguf gguf_dequant:gguf-dequant; do
-  "$MOJO" build src/${t%%:*}.mojo -I src -o "$W/${t##*:}" > "$W/build-${t##*:}.log" 2>&1 || { echo "FAIL build: $W/build-${t##*:}.log"; exit 1; }
+  "$MOJO" build src/${t%%:*}.mojo -I src -I lib -o "$W/${t##*:}" > "$W/build-${t##*:}.log" 2>&1 || { echo "FAIL build: $W/build-${t##*:}.log"; exit 1; }
 done
 "$PY" tools/mkfloat.py "$W/float.gguf" > "$W/float.log" 2>&1 || { echo "FAIL fixture: $W/float.log"; exit 1; }
 T=$W/float.gguf
@@ -46,7 +46,7 @@ for t in Q8_0 Q4_0 TQ1_0 TQ2_0; do check "quantize-float-$t" qcheck "$t"; done
 qmutant() { # NAME FROM TO: quantize built from a copy of src/ with one load path broken must fail qcheck on that tensor
   local d=$W/mut-$1; rm -rf "$d"; mkdir -p "$d"; cp -r src "$d/src"
   "$PY" -I -c 'import sys; p, a, b = sys.argv[1:]; s = open(p).read(); assert a in s, "mutant does not apply: " + a; open(p, "w").write(s.replace(a, b, 1))' "$d/src/quantize.mojo" "$2" "$3" || return 1
-  "$MOJO" build "$d/src/quantize.mojo" -I "$d/src" -o "$d/quantize" > "$d/build.log" 2>&1 || { echo "     mutant does not build: $d/build.log"; return 1; }
+  "$MOJO" build "$d/src/quantize.mojo" -I "$d/src" -I lib -o "$d/quantize" > "$d/build.log" 2>&1 || { echo "     mutant does not build: $d/build.log"; return 1; }
   ! qcheck Q8_0 "$d/quantize" > "$d/out.log" 2>&1 && grep -q "^FAIL blk.0.$1.weight" "$W/qf-Q8_0.cmp"; }  # a comparison failure, not a crash
 check mutant-f32-load-caught qmutant f32 'dst[unsafe_offset=i] = bitcast[DType.float32](UInt32(v))
     elif t == T_BF16:' 'dst[unsafe_offset=i] = bitcast[DType.float32](UInt32(v)) * 2.0
@@ -54,7 +54,7 @@ check mutant-f32-load-caught qmutant f32 'dst[unsafe_offset=i] = bitcast[DType.f
 check mutant-f16-load-caught qmutant f16 'dst[unsafe_offset=i] = Float32(bitcast[DType.float16](UInt16(v)))' 'dst[unsafe_offset=i] = Float32(bitcast[DType.float16](UInt16(v))) * 2.0'
 
 # safetensors tensor entries that must be rejected: offsets outside the data, reversed, or not matching the shape
-"$MOJO" build tests/st_open.mojo -I src -o "$W/st_open" > "$W/build-st_open.log" 2>&1 || { echo "FAIL build: $W/build-st_open.log"; exit 1; }
+"$MOJO" build tests/st_open.mojo -I src -I lib -o "$W/st_open" > "$W/build-st_open.log" 2>&1 || { echo "FAIL build: $W/build-st_open.log"; exit 1; }
 stcase() { # NAME HEADER-JSON DATA-BYTES WANT(ok|error)
   local d=$W/st-$1; rm -rf "$d"; mkdir -p "$d"
   "$PY" -I -c 'import struct, sys; h = sys.argv[1].encode(); open(sys.argv[3] + "/model.safetensors", "wb").write(struct.pack("<Q", len(h)) + h + bytes(int(sys.argv[2])))' "$2" "$3" "$d"
@@ -104,11 +104,11 @@ for f in zero-d zero-ne0; do
   check "quantize-$f" refused "$W/$f.gguf" "$W/quantize" --pure "$W/$f.gguf" "$W/$f.q8" Q8_0
 done
 # the library's libc declarations must not clash with the stdlib's (FileHandle.seek declares lseek)
-check coexist-builds "$MOJO" build tests/coexist.mojo -I src -o "$W/coexist"
+check coexist-builds "$MOJO" build tests/coexist.mojo -I src -I lib -o "$W/coexist"
 coexist() { "$W/coexist" "$W/float.gguf" "$W/st-control/model.safetensors" | grep -q '^coexist: ok'; }
 check coexist-runs coexist
 # py_repr equals Python's repr for every code point (gguf-tool dump text output)
-"$MOJO" build tests/repr_all.mojo -I src -o "$W/repr_all" > "$W/build-repr_all.log" 2>&1 || { echo "FAIL build: $W/build-repr_all.log"; exit 1; }
+"$MOJO" build tests/repr_all.mojo -I src -I lib -o "$W/repr_all" > "$W/build-repr_all.log" 2>&1 || { echo "FAIL build: $W/build-repr_all.log"; exit 1; }
 reprs() { "$W/repr_all" > "$W/repr.mojo" && "$PY" -I -c 'import sys; sys.stdout.reconfigure(encoding="utf-8")
 for cp in range(0x110000):
     if not 0xD800 <= cp < 0xE000: print(repr(chr(cp)))' > "$W/repr.py" && cmp "$W/repr.py" "$W/repr.mojo"; }

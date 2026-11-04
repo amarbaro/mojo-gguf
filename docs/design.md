@@ -4,10 +4,10 @@
 - `src/gguf/`: the GGUF reader and writer (`model.mojo`), value decoding (`values.mojo`), the ggml type tables and dequantizers (`quant.mojo`,
   `dequant.mojo`, `quants.mojo`), the quantizer grids, `sha.mojo` for `hash`, and `fmt.mojo` for the text of `dump`.
 - `src/st/`: safetensors (every shard mmapped read-only) and the JSON reader for its headers and for
-  `tokenizer.json`. `src/hfconv/`: the Hugging Face to GGUF rules (tensor naming, f16/bf16, tokenizer). `src/uregex/`: a vendored copy of
-  `mojo-uregex` for the pre-tokenizer patterns; a clone must build without anything outside it, so it is a real copy, synced by hand.
+  `tokenizer.json`. `src/hfconv/`: the Hugging Face to GGUF rules (tensor naming, f16/bf16, tokenizer). The pre-tokenizer
+  patterns run on `mojo-uregex`, a `[tool.mojo] deps` entry that `scripts/deps.sh` fetches into `lib/`, pinned to a commit.
 - Each command is one file in `src/` with a `main()` (`hf2gguf`, `quantize`, `lora2gguf`, `ggml2gguf`, `gguf_tool`, `gguf_rewrite`, `gguf_dequant`,
-  `hf_update`). They are built with `mojo build -I src`; the four packages are also precompiled for the conda recipe.
+  `hf_update`). They are built with `mojo build -I src -I lib`; the three packages are also precompiled for the conda recipe.
 
 ## Target: the same bytes
 The reference is llama.cpp pinned at `1744c6bde` (its `convert_*.py`, `llama-quantize --pure`, `gguf-py` and `ggml-quants.c`). A command is done when

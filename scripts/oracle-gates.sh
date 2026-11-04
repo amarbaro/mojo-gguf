@@ -13,6 +13,7 @@ cd "$(dirname "$0")/.."
 : "${ORACLE_PY:?FAIL setup: set ORACLE_PY to a python with torch and transformers}"
 : "${QWEN_HF:?FAIL setup: set QWEN_HF to the Qwen2.5-0.5B-Instruct directory}"
 export LLAMACPP ORACLE_PY QWEN_HF
+scripts/deps.sh
 O=.work/oracle/qwen25-05b
 [ -s "$O/bf16.gguf" ] && [ -s "$O/Q4_K.gguf" ] || tools/mkoracle.sh "$QWEN_HF" qwen25-05b
 [ -s .work/oracle/lora/b-q8_0.gguf ] || tools/mkoracle-lora.sh "$QWEN_HF"

@@ -4,5 +4,5 @@
 set -euo pipefail
 source "$(dirname "$0")/gate-lib.sh"
 W=.work/u2; mkdir -p "$W"
-"$MOJO" build src/u2_lookup.mojo -I src -o "$W/u2-lookup" > "$W/lookup-build.log" 2>&1 || { echo "FAIL build: see $W/lookup-build.log"; exit 1; }
+"$MOJO" build src/u2_lookup.mojo -I src -I lib -o "$W/u2-lookup" > "$W/lookup-build.log" 2>&1 || { echo "FAIL build: see $W/lookup-build.log"; exit 1; }
 "$PY" -I tests/u2-lookup-check.py "$GGUFPY" "$W/u2-lookup" "$W/lookup-cases.tsv"

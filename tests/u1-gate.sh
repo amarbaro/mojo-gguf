@@ -10,7 +10,7 @@ source "$(dirname "$0")/gate-lib.sh"
 FLASH=${FLASH_GGUF:-/nonexistent}
 W=.work/u1; mkdir -p "$W"
 
-build() { "$MOJO" build src/gguf_rewrite.mojo -I src -o "$W/gguf-rewrite" > "$W/build.log" 2>&1; }
+build() { "$MOJO" build src/gguf_rewrite.mojo -I src -I lib -o "$W/gguf-rewrite" > "$W/build.log" 2>&1; }
 if ! build; then echo "FAIL build: see $W/build.log"; tail -5 "$W/build.log"; echo "FAIL 1/1 build"; exit 1; fi
 
 rewrite() {

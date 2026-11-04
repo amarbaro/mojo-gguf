@@ -21,20 +21,21 @@ def main() raises:
 ```
 
 ```
-mojo build -I src src/hf2gguf.mojo -o hf2gguf
+scripts/deps.sh                                                              # mojo-uregex into lib/, pinned
+mojo build -I src -I lib src/hf2gguf.mojo -o hf2gguf
 ./hf2gguf Qwen2.5-0.5B-Instruct --outfile qwen.bf16.gguf --outtype bf16      # 0.26 s, same bytes as the script
-mojo build -I src src/quantize.mojo -o quantize
+mojo build -I src -I lib src/quantize.mojo -o quantize
 ./quantize --pure qwen.bf16.gguf qwen.q4_k.gguf Q4_K                         # same bytes as llama-quantize --pure
 ```
 
 ## Install
 
-Requires Mojo 1.2 (`uv sync` installs it) and Linux x86-64. Nothing else: every command builds with the `mojo`
-package alone, no linker flags.
+Requires Mojo 1.2 (`uv sync` installs it) and Linux x86-64, no linker flags. The tokenizer converter imports
+[mojo-uregex](https://github.com/amarbaro/mojo-uregex): `scripts/deps.sh` fetches it into `lib/`, pinned to a commit.
 
 | Way | Command |
 |---|---|
-| A command | `mojo build -I path/to/mojo-gguf/src path/to/mojo-gguf/src/<command>.mojo -o <command>` |
+| A command | `mojo build -I path/to/mojo-gguf/src -I path/to/mojo-gguf/lib path/to/mojo-gguf/src/<command>.mojo -o <command>` |
 | The library | `mojo build -I path/to/mojo-gguf/src app.mojo`, then `from gguf import Gguf` |
 | Vendor | copy `src/gguf/` into your project |
 

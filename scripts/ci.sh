@@ -1,20 +1,22 @@
 #!/usr/bin/env bash
-# CI entry point, same on a GitHub runner and a local machine: install, build, then every CPU gate that needs no model
-# file and no llama.cpp build (fixtures are synthetic, the oracle is the pinned llama.cpp's Python). The gates that
-# need Qwen2.5-0.5B, a llama.cpp build or the author's model files run locally: scripts/oracle-gates.sh.
+# CI entry point, same on a GitHub runner and a local machine: install, fetch the Mojo libraries (scripts/deps.sh),
+# build, then every CPU gate that needs no model file and no llama.cpp build (fixtures are synthetic, the oracle is
+# the pinned llama.cpp's Python). The gates that need Qwen2.5-0.5B, a llama.cpp build or the author's model files run
+# locally: scripts/oracle-gates.sh.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 v=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml); c=$(sed -n 's/^- \[v\([0-9.]*\)\].*/\1/p' CHANGELOG.md | head -1)
 [ "$v" = "$c" ] || { echo "FAIL version: pyproject $v vs newest CHANGELOG entry $c"; exit 1; }
 command -v uv >/dev/null || { echo "FAIL setup: uv not installed"; exit 1; }
 uv sync || { echo "FAIL setup: uv sync"; exit 1; }
+scripts/deps.sh
 .venv/bin/python -c 'import platform; print("oracle python", platform.python_version())'
 scripts/fetch-llamacpp.sh || { echo "FAIL setup: scripts/fetch-llamacpp.sh"; exit 1; }
 mkdir -p .work/t
 M=.venv/bin/mojo
 # every program builds; the ones a gate below does not build itself are built here
 for t in src/hf2gguf:hf2gguf src/quantize:quantize src/lora2gguf:lora2gguf src/hf_update:hf-update tools/type-census:type-census examples/quickstart:quickstart; do
-  $M build -I src "${t%%:*}.mojo" -o ".work/t/${t##*:}" 2> .work/build.err || { echo "FAIL build: ${t%%:*}.mojo"; cat .work/build.err; exit 1; }
+  $M build -I src -I lib "${t%%:*}.mojo" -o ".work/t/${t##*:}" 2> .work/build.err || { echo "FAIL build: ${t%%:*}.mojo"; cat .work/build.err; exit 1; }
 done
 gate() { local name=$1; shift
   "$@" > ".work/t/$name.log" 2>&1 || { echo "FAIL $name: $*"; tail -20 ".work/t/$name.log"; exit 1; }

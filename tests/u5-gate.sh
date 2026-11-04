@@ -8,7 +8,7 @@
 source "$(dirname "$0")/gate-lib.sh"
 W=$PWD/.work/u5; rm -rf "$W"; mkdir -p "$W"
 check llama-cpp-pinned pinned
-build() { "$MOJO" build src/gguf_tool.mojo -I src -o "$W/gguf-tool" > "$W/build.log" 2>&1; }
+build() { "$MOJO" build src/gguf_tool.mojo -I src -I lib -o "$W/gguf-tool" > "$W/build.log" 2>&1; }
 check build build
 FLASH=${FLASH_GGUF:-/nonexistent}
 check dump-q4k            run_case dump-q4k  "$ORACLE/Q4_K.gguf"  dump m.gguf

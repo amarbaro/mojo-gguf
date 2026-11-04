@@ -7,7 +7,7 @@
 source "$(dirname "$0")/gate-lib.sh"
 W=$PWD/.work/u8; rm -rf "$W"; mkdir -p "$W"; UO=$MAIN/.work/oracle/u8; SUMMARY=${U8_SUMMARY:-$UO/summary.txt}
 check llama-cpp-pinned pinned
-build() { "$MOJO" build src/hf_update.mojo -I src -o "$W/hf-update" > "$W/build.log" 2>&1; }
+build() { "$MOJO" build src/hf_update.mojo -I src -I lib -o "$W/hf-update" > "$W/build.log" 2>&1; }
 check build build
 one() { local line=$1 d=${1%% ntok *}; local want=${line#"$d "}
   local got; got=$("$W/hf-update" "$d" 2> "$W/$(basename "$d").err") || return 1

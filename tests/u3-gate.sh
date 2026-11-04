@@ -5,7 +5,7 @@
 source "$(dirname "$0")/gate-lib.sh"
 W=$PWD/.work/u3; rm -rf "$W"; mkdir -p "$W"
 check llama-cpp-pinned pinned
-build() { "$MOJO" build src/hf2gguf.mojo -I src -o "$W/hf2gguf" > "$W/build.log" 2>&1; }
+build() { "$MOJO" build src/hf2gguf.mojo -I src -I lib -o "$W/hf2gguf" > "$W/build.log" 2>&1; }
 check build build
 conv() { local t=$1 ref=$2
   /usr/bin/time -f "%e s %M KB" -o "$W/$t.time" "$W/hf2gguf" "$HF05" --outfile "$W/$t.gguf" --outtype "$t" > "$W/$t.log" 2>&1 || return 1

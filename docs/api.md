@@ -2,7 +2,7 @@
 
 Every command below is checked against the pinned llama.cpp (`1744c6bde`) by a gate in `tests/` (list in
 [gates.md](gates.md)); the library calls are the ones the commands use. Build any command with
-`mojo build -I src src/<file>.mojo -o <name>`. All commands print `FAIL <command>: <reason>` and exit 1 on bad input.
+`scripts/deps.sh`, then `mojo build -I src -I lib src/<file>.mojo -o <name>`. All commands print `FAIL <command>: <reason>` and exit 1 on bad input.
 
 ## Commands
 

@@ -6,7 +6,7 @@
 source "$(dirname "$0")/gate-lib.sh"
 W=$PWD/.work/u9-parity; rm -rf "$W"; mkdir -p "$W"; GO=$MAIN/.work/oracle/ggml
 check llama-cpp-pinned pinned
-check build "$MOJO" build src/ggml2gguf.mojo -I src -o "$W/ggml2gguf"
+check build "$MOJO" build src/ggml2gguf.mojo -I src -I lib -o "$W/ggml2gguf"
 check fixtures "$PY" tests/mk-ggml-variants.py "$W/fix"
 
 # parity INPUT EXPECT ARGS...: EXPECT is ok (both exit 0, identical bytes) or refuse (both exit 1 with a FAIL line)

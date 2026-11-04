@@ -6,7 +6,7 @@
 source "$(dirname "$0")/gate-lib.sh"
 W=$PWD/.work/u7; rm -rf "$W"; mkdir -p "$W"; LO=$MAIN/.work/oracle/lora
 check llama-cpp-pinned pinned
-build() { "$MOJO" build src/lora2gguf.mojo -I src -o "$W/lora2gguf" > "$W/build.log" 2>&1; }
+build() { "$MOJO" build src/lora2gguf.mojo -I src -I lib -o "$W/lora2gguf" > "$W/build.log" 2>&1; }
 check build build
 conv() { local a=$1 t=$2 ref=$LO/$1-$2.gguf
   /usr/bin/time -f "%e s %M KB" -o "$W/$a-$t.time" "$W/lora2gguf" "$LO/$a" --base "$HF05" --outfile "$W/$a-$t.gguf" --outtype "$t" > "$W/$a-$t.log" 2>&1 || return 1

@@ -11,7 +11,7 @@ gen() { "$PY" -I tools/gen-tables.py "$GGUFPY" "$1" > "$W/gen.log" 2>&1; }
 check generator-runs gen "$W/a"
 check generator-deterministic bash -c "$(declare -f gen); PY='$PY' GGUFPY='$GGUFPY' W='$W'; gen '$W/b' && diff -r '$W/a' '$W/b' > /dev/null"
 check committed-equals-generated bash -c "cmp -s '$W/a/consts.mojo' src/gguf/consts.mojo && cmp -s '$W/a/tensor_map.mojo' src/gguf/tensor_map.mojo"
-build() { "$MOJO" build src/u2_dump.mojo -I src -o "$W/u2-dump" > "$W/build.log" 2>&1; }
+build() { "$MOJO" build src/u2_dump.mojo -I src -I lib -o "$W/u2-dump" > "$W/build.log" 2>&1; }
 check build build
 dump() { "$PY" -I tests/u2-oracle.py "$GGUFPY" > "$W/ref.json" && "$W/u2-dump" > "$W/got.json" && cmp -s "$W/ref.json" "$W/got.json"; }
 check dump-equals-gguf-py dump

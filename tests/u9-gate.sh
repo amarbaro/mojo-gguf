@@ -6,7 +6,7 @@
 source "$(dirname "$0")/gate-lib.sh"
 W=$PWD/.work/u9; rm -rf "$W"; mkdir -p "$W"; GO=$MAIN/.work/oracle/ggml
 check llama-cpp-pinned pinned
-build() { "$MOJO" build src/ggml2gguf.mojo -I src -o "$W/ggml2gguf" > "$W/build.log" 2>&1; }
+build() { "$MOJO" build src/ggml2gguf.mojo -I src -I lib -o "$W/ggml2gguf" > "$W/build.log" 2>&1; }
 check build build
 conv() { local f=$1
   "$W/ggml2gguf" --input "$GO/$f.bin" --output "$W/$f.gguf" > "$W/$f.log" 2>&1 || return 1

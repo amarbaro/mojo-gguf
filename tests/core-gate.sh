@@ -12,7 +12,7 @@ check llama-cpp-pinned pinned
 W=$PWD/.work/core; rm -rf "$W"; mkdir -p "$W"; FX=$W/fx
 LLAMACPP=$LLAMACPP "$PY" tools/mkfixture.py "$FX" > "$W/fixture.log" 2>&1 || { echo "FAIL fixture: $W/fixture.log"; exit 1; }
 for t in gguf_rewrite:gguf-rewrite gguf_tool:gguf-tool gguf_dequant:gguf-dequant; do
-  "$MOJO" build src/${t%%:*}.mojo -I src -o "$W/${t##*:}" > "$W/build-${t##*:}.log" 2>&1 || { echo "FAIL build: $W/build-${t##*:}.log"; exit 1; }
+  "$MOJO" build src/${t%%:*}.mojo -I src -I lib -o "$W/${t##*:}" > "$W/build-${t##*:}.log" 2>&1 || { echo "FAIL build: $W/build-${t##*:}.log"; exit 1; }
 done
 
 rewrite() { local src=$1 tag=$2 ref=${3:-$1}; shift 3 || shift $#
