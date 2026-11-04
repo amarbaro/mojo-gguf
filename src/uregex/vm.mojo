@@ -1,7 +1,3 @@
-# VENDORED COPY of mojo-uregex (src/uregex/vm.mojo). This repo keeps a real file rather than a symlink or an
-# -I path outside the tree, because a clone must build without anything outside it. Sync by hand if the
-# upstream changes.
-#
 # Copyright 2026 amarbaro.org. Licensed under the Apache License, Version 2.0.
 from .parser import (
     Ast, Node, N_EMPTY, N_LIT, N_CLASS, N_ANY, N_CAT, N_ALT, N_REPEAT, N_LOOK, N_BOL, N_EOL,
@@ -33,8 +29,13 @@ struct Inst(Copyable, Movable):
     var b: Int32
 
 
+comptime MAX_PROGRAM = 1 << 20
+"""Counted repeats are unrolled; a pattern that compiles to more instructions than this raises (Inst is 12 B)."""
+
+
 struct Program(Copyable, Movable):
     var code: List[Inst]
+    var too_big: Bool
     var classes: List[CharClass]
     var cases: CaseMap
     var groups: Int
@@ -47,8 +48,9 @@ struct Program(Copyable, Movable):
     var first_hi: UInt64
     var first_nonascii: Bool
 
-    def __init__(out self, ast: Ast):
+    def __init__(out self, ast: Ast) raises:
         self.code = List[Inst]()
+        self.too_big = False
         self.classes = ast.classes.copy()
         for ref c in self.classes:
             c.build_ascii()
@@ -61,6 +63,8 @@ struct Program(Copyable, Movable):
         self.first_hi = 0
         self.first_nonascii = False
         self.emit_node(ast, ast.root)
+        if self.too_big:
+            raise Error("uregex: pattern too large (counted repeats compile to more than " + String(MAX_PROGRAM) + " instructions)")
         self.code.append(Inst(UInt8(I_MATCH), False, False, 0, 0))
         self.build_first()
         self.full = self.groups > 0
@@ -122,10 +126,15 @@ struct Program(Copyable, Movable):
         return (self.first_hi >> UInt64(b0 - 64)) & 1 == 1
 
     def emit(mut self, op: Int, a: Int = 0, b: Int = 0, ci: Bool = False, neg: Bool = False) -> Int:
+        if len(self.code) >= MAX_PROGRAM:
+            self.too_big = True
+            return 0
         self.code.append(Inst(UInt8(op), ci, neg, Int32(a), Int32(b)))
         return len(self.code) - 1
 
     def emit_node(mut self, ast: Ast, i: Int):
+        if self.too_big:
+            return
         var n = ast.nodes[i].copy()
         if n.kind == N_EMPTY:
             return
@@ -140,7 +149,7 @@ struct Program(Copyable, Movable):
         elif n.kind == N_BOL:
             _ = self.emit(I_BOL)
         elif n.kind == N_EOL:
-            _ = self.emit(I_EOL)
+            _ = self.emit(I_EOL, 0, 0, False, n.neg)
         elif n.kind == N_CAT:
             for k in n.kids:
                 self.emit_node(ast, k)
@@ -159,6 +168,8 @@ struct Program(Copyable, Movable):
                 self.code[jp].a = Int32(len(self.code))
         elif n.kind == N_REPEAT:
             for _ in range(n.lo):
+                if self.too_big:
+                    return
                 self.emit_node(ast, n.kids[0])
             # SPLIT tries `a` first: the body when greedy, the exit when lazy.
             if n.hi == -1:
@@ -169,6 +180,8 @@ struct Program(Copyable, Movable):
             else:
                 var splits = List[Int]()
                 for _ in range(n.hi - n.lo):
+                    if self.too_big:
+                        return
                     splits.append(self.emit(I_SPLIT))
                     self.emit_node(ast, n.kids[0])
                 for sp in splits:
@@ -302,8 +315,8 @@ struct Program(Copyable, Movable):
                     pc += 1
                 else:
                     ok = False
-            elif op == I_EOL:
-                if pos == n:
+            elif op == I_EOL:   # Python's `$`: the end, or just before a final "\n"; neg (\Z, \z): the end only
+                if pos == n or (not ins.neg and pos == n - 1 and text[pos] == 10):
                     pc += 1
                 else:
                     ok = False
