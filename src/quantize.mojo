@@ -9,7 +9,7 @@ from std.memory import bitcast
 from std.sys import argv, exit, num_logical_cores
 from gguf.par import parallelize
 from gguf import Gguf
-from gguf.model import Out, T_STRING, pad_to, pread_into
+from gguf.model import Out, T_STRING, pad_to, pread_into, refuse_same_file
 from gguf.quants import (FP, BP, T_F32, T_F16, T_BF16, T_Q4_0, T_Q5_0, T_Q8_0, T_Q2_K, T_Q4_K, T_Q6_K,
                          T_TQ1_0, T_TQ2_0, T_Q2_0, QK_K, blck, row_size, quantize_row)
 
@@ -193,6 +193,7 @@ def run() raises:
     if not pure or len(pos) < 3:
         raise Error("usage: quantize --pure IN OUT TYPE [NTHREADS] (only --pure is implemented)")
     var nthreads = Int(pos[3]) if len(pos) > 3 else num_logical_cores()
+    refuse_same_file(pos[0], pos[1])
     var ft = parse_type(pos[2])
     var g = Gguf(pos[0])
     var n = len(g.tensors)

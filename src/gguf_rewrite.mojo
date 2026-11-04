@@ -1,6 +1,7 @@
 """Gguf-rewrite IN OUT [--name STR] [--remove KEY]...: parse a GGUF, serialize it again."""
 from std.sys import argv, exit
 from gguf import Gguf
+from gguf.model import refuse_same_file
 
 def run() raises:
     var a = argv()
@@ -18,6 +19,7 @@ def run() raises:
             i += 2
         else:
             raise Error("unknown argument " + String(a[i]))
+    refuse_same_file(String(a[1]), String(a[2]))
     var g = Gguf(String(a[1]))
     print(g.summary())
     g.rewrite(String(a[2]), name, remove)

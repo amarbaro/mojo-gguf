@@ -12,7 +12,7 @@ Not ported: a tensor whose data runs past the end of the input (the script write
 from std.sys import argv, exit
 from std.ffi import external_call
 from std.memory import bitcast
-from gguf.model import Out, open_fd, pread_into, pad_to
+from gguf.model import Out, open_fd, pread_into, pad_to, refuse_same_file
 from gguf.quant import row, tensor_bytes
 from gguf.tensor_lookup import map_tensor_name
 
@@ -309,6 +309,7 @@ def emit(src: Src, cfg: Cfg, L: Legacy) raises:
     # gguf-py add_string skips an empty value: an empty name or description is not written
     var n_kv = N_KV - Int(name.byte_length() == 0) - Int(desc.byte_length() == 0)
     var ar = "llama."
+    refuse_same_file(cfg.input, cfg.output)
     var out = Out(cfg.output)
     out.put(MAGIC, 4)
     out.put(3, 4)

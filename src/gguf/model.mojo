@@ -6,6 +6,8 @@ and nested arrays are validated by the walk). `rewrite` streams KV payloads and 
 source through one CHUNK-byte staging buffer.
 """
 from std.ffi import external_call, c_ssize_t
+from std.os import stat
+from std.os.path import exists
 
 comptime MAGIC = 0x46554747
 comptime WINDOW = 256 << 10
@@ -42,6 +44,12 @@ def pread_into(fd: Int32, mut dst: List[UInt8], at: Int, n: Int, off: Int) raise
         if r <= 0:
             raise Error("short read at byte " + String(off + got))
         got += Int(r)
+
+def refuse_same_file(inp: String, dst: String) raises:
+    """Out truncates its file on open: an output that is the input (or a link to it) would erase it mid-read."""
+    if exists(dst) and stat(inp).st_ino == stat(dst).st_ino and stat(inp).st_dev == stat(dst).st_dev:
+        raise Error("output " + dst + " is the input file")
+
 
 struct Out(Movable):
     """Output file behind one CHUNK-byte staging buffer; every write goes through `buf`."""
