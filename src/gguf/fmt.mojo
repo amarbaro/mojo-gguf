@@ -5,6 +5,7 @@ shortest repr (checked against both, 2026-10-12).
 """
 from std.math import floor, isinf, isnan
 from std.memory import bitcast
+from .nonprint import nonprintable
 
 
 def rep(ch: String, n: Int) -> String:
@@ -94,7 +95,7 @@ def py_title(s: String) -> String:
 
 
 def py_repr(s: String) -> String:
-    """repr() of a Python str: quote choice, \\ \\' \\t \\n \\r and \\xNN for control bytes; other text as is."""
+    """repr() of a Python str: quote choice, \\ \\' \\t \\n \\r, and \\xNN \\uNNNN \\UNNNNNNNN for what str.isprintable() rejects."""
     var q = "'"
     if s.find("'") >= 0 and s.find('"') < 0:
         q = '"'
@@ -114,8 +115,8 @@ def py_repr(s: String) -> String:
             out += "\\n"
         elif cp == 13:
             out += "\\r"
-        elif cp < 0x20 or (cp >= 0x7F and cp < 0xA0):
-            out += "\\x" + hexn(cp, 2)
+        elif nonprintable(cp):
+            out += "\\x" + hexn(cp, 2) if cp < 0x100 else "\\u" + hexn(cp, 4) if cp < 0x10000 else "\\U" + hexn(cp, 8)
         else:
             out += String(unsafe_from_utf8=b[i : i + step])
         i += step

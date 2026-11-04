@@ -55,4 +55,10 @@ check st-one-offset-nl stcase onenl "{\"a\":{\"dtype\":\"F32\",\"shape\":[2],\"d
 check coexist-builds "$MOJO" build tests/coexist.mojo -I src -o "$W/coexist"
 coexist() { "$W/coexist" "$W/float.gguf" "$W/st-control/model.safetensors" | grep -q '^coexist: ok'; }
 check coexist-runs coexist
+# py_repr equals Python's repr for every code point (gguf-tool dump text output)
+"$MOJO" build tests/repr_all.mojo -I src -o "$W/repr_all" > "$W/build-repr_all.log" 2>&1 || { echo "FAIL build: $W/build-repr_all.log"; exit 1; }
+reprs() { "$W/repr_all" > "$W/repr.mojo" && "$PY" -I -c 'import sys; sys.stdout.reconfigure(encoding="utf-8")
+for cp in range(0x110000):
+    if not 0xD800 <= cp < 0xE000: print(repr(chr(cp)))' > "$W/repr.py" && cmp "$W/repr.py" "$W/repr.mojo"; }
+check py-repr-all-code-points reprs
 finish
