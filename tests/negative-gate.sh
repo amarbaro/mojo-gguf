@@ -5,6 +5,7 @@
 # Checkpoint: tensor entries with a negative or reversed offset, a shape that does not match the byte count, an overflowing shape, one offset.
 # coexist: a program that seeks a file and also links Gguf, Json and Shard builds and runs.
 # quantize NTHREADS 0 (llama-quantize: all cores): same bytes as an explicit count, tensors not left zero.
+# quantize F32 and F16 sources (zero, flat, inf, denormal rows) to Q8_0 Q4_0 TQ1_0 TQ2_0: rows equal gguf-py's quantizer; two load-path mutants are caught.
 source "$(dirname "$0")/gate-lib.sh"
 check llama-cpp-pinned pinned
 W=$PWD/.work/neg; rm -rf "$W"; mkdir -p "$W"
@@ -35,6 +36,22 @@ nthreads() {
   cmp -s "$W/q0.gguf" "$W/q2.gguf" || { echo "     nthreads 0 differs from 2: $(cmp "$W/q0.gguf" "$W/q2.gguf" 2>&1 | head -1)"; return 1; }
 }
 check quantize-nthreads-0 nthreads
+
+# quantize on the float fixture (F32 and F16 tensors; zero, flat, inf, denormal and near-F16-limit rows) equals gguf-py's own
+# quantizer byte for byte; two mutants of the load paths (one per float type) must be caught by the same comparison
+qcheck() { local t=$1 q=${2:-$W/quantize} o=$W/qf-$1.gguf
+  "$q" --pure "$T" "$o" "$t" > "$W/qf-$t.log" 2>&1 || { echo "     quantize $t: $(tail -1 "$W/qf-$t.log")"; return 1; }
+  "$PY" -I tools/quant_check.py "$T" "$o" "$t" > "$W/qf-$t.cmp" 2>&1 || { grep FAIL "$W/qf-$t.cmp" | head -3 | sed 's/^/     /'; return 1; }; }
+for t in Q8_0 Q4_0 TQ1_0 TQ2_0; do check "quantize-float-$t" qcheck "$t"; done
+qmutant() { # NAME FROM TO: quantize built from a copy of src/ with one load path broken must fail qcheck on that tensor
+  local d=$W/mut-$1; rm -rf "$d"; mkdir -p "$d"; cp -r src "$d/src"
+  "$PY" -I -c 'import sys; p, a, b = sys.argv[1:]; s = open(p).read(); assert a in s, "mutant does not apply: " + a; open(p, "w").write(s.replace(a, b, 1))' "$d/src/quantize.mojo" "$2" "$3" || return 1
+  "$MOJO" build "$d/src/quantize.mojo" -I "$d/src" -o "$d/quantize" > "$d/build.log" 2>&1 || { echo "     mutant does not build: $d/build.log"; return 1; }
+  ! qcheck Q8_0 "$d/quantize" > "$d/out.log" 2>&1 && grep -q "^FAIL blk.0.$1.weight" "$W/qf-Q8_0.cmp"; }  # a comparison failure, not a crash
+check mutant-f32-load-caught qmutant f32 'dst[unsafe_offset=i] = bitcast[DType.float32](UInt32(v))
+    elif t == T_BF16:' 'dst[unsafe_offset=i] = bitcast[DType.float32](UInt32(v)) * 2.0
+    elif t == T_BF16:'
+check mutant-f16-load-caught qmutant f16 'dst[unsafe_offset=i] = Float32(bitcast[DType.float16](UInt16(v)))' 'dst[unsafe_offset=i] = Float32(bitcast[DType.float16](UInt16(v))) * 2.0'
 
 # safetensors tensor entries that must be rejected: offsets outside the data, reversed, or not matching the shape
 "$MOJO" build tests/st_open.mojo -I src -o "$W/st_open" > "$W/build-st_open.log" 2>&1 || { echo "FAIL build: $W/build-st_open.log"; exit 1; }
