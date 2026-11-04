@@ -23,6 +23,8 @@ def run() raises:
     var info = quant_block(g.tensors[ti].ttype)
     if info[0] == 0:
         raise Error("tensor " + String(a[2]) + ": no dequantizer for ggml type " + String(g.tensors[ti].ttype))
+    if len(g.tensors[ti].dims) == 0 or g.tensors[ti].dims[0] <= 0:
+        raise Error("tensor " + String(a[2]) + " has no dimensions or a first dimension of 0")
     var ne0 = g.tensors[ti].dims[0]
     var nrows = 1
     for d in range(1, len(g.tensors[ti].dims)):

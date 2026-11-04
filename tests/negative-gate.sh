@@ -10,7 +10,7 @@ source "$(dirname "$0")/gate-lib.sh"
 check llama-cpp-pinned pinned
 W=$PWD/.work/neg; rm -rf "$W"; mkdir -p "$W"
 export LLAMACPP
-for t in gguf_rewrite:gguf-rewrite quantize:quantize gguf_tool:gguf-tool ggml2gguf:ggml2gguf; do
+for t in gguf_rewrite:gguf-rewrite quantize:quantize gguf_tool:gguf-tool ggml2gguf:ggml2gguf gguf_dequant:gguf-dequant; do
   "$MOJO" build src/${t%%:*}.mojo -I src -o "$W/${t##*:}" > "$W/build-${t##*:}.log" 2>&1 || { echo "FAIL build: $W/build-${t##*:}.log"; exit 1; }
 done
 "$PY" tools/mkfloat.py "$W/float.gguf" > "$W/float.log" 2>&1 || { echo "FAIL fixture: $W/float.log"; exit 1; }
@@ -88,6 +88,21 @@ badutf_ggml() { local f=$MAIN/.work/oracle/ggml/ggjt3-f16.bin; [ -s "$f" ] || { 
   [ "$rc" = 1 ] && grep -q "Bad name" "$W/badname.log" || { echo "     ggml2gguf exit $rc: $(tail -1 "$W/badname.log")"; return 1; }
   "$PY" -I -c 'import sys; open(sys.argv[1], "rb").read().decode("utf-8")' "$W/badname.log" 2>/dev/null || { echo "     the refusal printed invalid UTF-8"; return 1; }; }
 check utf8-ggml2gguf badutf_ggml
+# a tensor with no dimensions or with ne0 == 0 (a one-tensor F32 file written by hand): gguf-dequant and quantize refuse it
+# (exit 1, a message) instead of indexing dims[0] or dividing by zero
+zero_dims() { "$PY" -I -c 'import struct, sys
+nd, dims = int(sys.argv[2]), [int(x) for x in sys.argv[3:]]
+name = b"t"
+info = struct.pack("<Q", len(name)) + name + struct.pack("<I", nd) + b"".join(struct.pack("<Q", d) for d in dims) + struct.pack("<IQ", 0, 0)
+head = b"GGUF" + struct.pack("<IQQ", 3, 1, 0) + info
+open(sys.argv[1], "wb").write(head + bytes(-len(head) % 32) + bytes(32))' "$@"; }
+refused() { local f=$1; shift; local rc=0; "$@" > "$W/refused.log" 2>&1 || rc=$?
+  [ "$rc" = 1 ] && grep -q "^FAIL" "$W/refused.log" || { echo "     $(basename "$f"): exit $rc, $(tail -1 "$W/refused.log" | cut -c1-100)"; return 1; }; }
+zero_dims "$W/zero-d.gguf" 0; zero_dims "$W/zero-ne0.gguf" 2 0 3
+for f in zero-d zero-ne0; do
+  check "dequant-$f"  refused "$W/$f.gguf" "$W/gguf-dequant" "$W/$f.gguf" t 0 1 "$W/$f.f32"
+  check "quantize-$f" refused "$W/$f.gguf" "$W/quantize" --pure "$W/$f.gguf" "$W/$f.q8" Q8_0
+done
 # the library's libc declarations must not clash with the stdlib's (FileHandle.seek declares lseek)
 check coexist-builds "$MOJO" build tests/coexist.mojo -I src -o "$W/coexist"
 coexist() { "$W/coexist" "$W/float.gguf" "$W/st-control/model.safetensors" | grep -q '^coexist: ok'; }

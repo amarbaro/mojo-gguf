@@ -202,6 +202,8 @@ def run() raises:
     var plans = List[Plan]()
     for t in range(n):
         ref info = g.tensors[t]
+        if len(info.dims) == 0 or info.dims[0] <= 0:
+            raise Error("tensor " + info.name + " has no dimensions or a first dimension of 0")
         var n_dims = len(info.dims)
         while n_dims > 1 and info.dims[n_dims - 1] == 1:
             n_dims -= 1
