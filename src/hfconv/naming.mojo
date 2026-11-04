@@ -21,13 +21,6 @@ def _lower(s: String) -> String:
         out.append(c + 32 if c >= 65 and c <= 90 else c)
     return String(unsafe_from_utf8=Span(out))
 
-def _upper_last(s: String) -> String:
-    var b = List[UInt8](Span(s.as_bytes()))
-    var n = len(b)
-    if b[n - 1] >= 97 and b[n - 1] <= 122:
-        b[n - 1] -= 32
-    return String(unsafe_from_utf8=Span(b))
-
 def _digits(b: Span[UInt8, _], i: Int) -> Int:
     """Index after the run of digits starting at i."""
     var k = i
