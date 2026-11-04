@@ -1,7 +1,7 @@
 """Gguf-dequant MODEL TENSOR ROW0 N OUT.f32: N rows of one tensor as little-endian f32, streamed in row chunks."""
 from std.sys import argv, exit
 from std.ffi import external_call, c_ssize_t
-from ggufx.model import Gguf, open_fd, pread_into
+from ggufx.model import CREATE, Gguf, open_fd, pread_into
 from ggufx.dequant import quant_block, deq_rows
 
 comptime CHUNK = 16 << 20  # f32 output bytes per round trip: bounds memory whatever N is (source is smaller)
@@ -35,7 +35,7 @@ def run() raises:
     var step = max(1, CHUNK // (ne0 * 4))
     var src = List[UInt8](length=min(n, step) * rb, fill=0)
     var dst = List[Float32](length=min(n, step) * ne0, fill=0)
-    var fd = open_fd(String(a[5]), 1 | 0o100 | 0o1000)  # O_WRONLY | O_CREAT | O_TRUNC
+    var fd = open_fd(String(a[5]), CREATE)
     var done = 0
     while done < n:
         var m = min(step, n - done)

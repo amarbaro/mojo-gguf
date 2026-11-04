@@ -30,9 +30,19 @@ def fixed_size(t: Int) -> Int:
 def pad_to(n: Int, align: Int) -> Int:
     return (n + align - 1) // align * align
 
+comptime CREATE = 1 | 0o100 | 0o1000  # O_WRONLY | O_CREAT | O_TRUNC
+
 def open_fd(path: String, flags: Int) raises -> Int32:
+    # open64 takes 2 arguments here, as in mojo-gguf-core and mojo-safetensors: one program cannot link two
+    # signatures of one libc symbol. Creating a file is creat64 (open with CREATE, mode 0644).
+    if flags & 0o100 and flags != CREATE:
+        raise Error("open_fd: O_CREAT only as CREATE")
     var p = path.copy()
-    var fd = external_call["open64", Int32](p.as_c_string_span().ptr(), Int32(flags), Int32(0o644))
+    var fd: Int32
+    if flags == CREATE:
+        fd = external_call["creat64", Int32](p.as_c_string_span().ptr(), Int32(0o644))
+    else:
+        fd = external_call["open64", Int32](p.as_c_string_span().ptr(), Int32(flags))
     if fd < 0:
         raise Error("cannot open " + path)
     return fd
@@ -59,7 +69,7 @@ struct Out(Movable):
     var buf: List[UInt8]
 
     def __init__(out self, path: String) raises:
-        self.fd = open_fd(path, 1 | 0o100 | 0o1000)  # O_WRONLY | O_CREAT | O_TRUNC
+        self.fd = open_fd(path, CREATE)
         self.off = 0
         self.used = 0
         self.buf = List[UInt8](length=CHUNK, fill=0)
