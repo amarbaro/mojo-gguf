@@ -1,6 +1,6 @@
 """Synthetic GGUF fixtures for the hermetic gates (tests/core-gate.sh), written with the pinned gguf-py.
 
-    mkfixture.py OUT_DIR       writes OUT_DIR/tiny.gguf (alignment 32) and OUT_DIR/tiny-a64.gguf (alignment 64)
+    mkfixture.py OUT_DIR       writes OUT_DIR/tiny.gguf (alignment 32), OUT_DIR/tiny-a64.gguf (alignment 64) and OUT_DIR/tiny-endian.gguf
 
 Both carry every scalar KV type, arrays of u8/i32/f32/bool/string, and one 8-row tensor per type gguf-py can
 quantize (F32 F16 BF16 Q4_0 Q4_1 Q5_0 Q5_1 Q8_0 TQ1_0 TQ2_0) after a 33-byte I8 tensor, seeded. Oracle only: product code is Mojo.
@@ -17,7 +17,7 @@ TYPES = [Q.F32, Q.F16, Q.BF16, Q.Q4_0, Q.Q4_1, Q.Q5_0, Q.Q5_1, Q.Q8_0, Q.TQ1_0, 
 COLS, ROWS = 256, 8
 
 
-def build(path, align):
+def build(path, align, types=TYPES, i8=True):
     rng = np.random.default_rng(align)
     w = GGUFWriter(path, "qwen2")
     w.add_name("mojo-gguf-fixture")
@@ -36,8 +36,9 @@ def build(path, align):
     w.add_token_list(["<unk>", "a", "b", "ab", "café", "☃"])
     w.add_token_scores([0.0, -1.0, -2.0, -3.5, -4.0, -5.0])
     w.add_token_types([2, 1, 1, 1, 1, 1])
-    w.add_tensor("blk.0.i8.weight", rng.integers(-128, 128, 33, dtype=np.int8))  # 33 bytes: padding to the alignment
-    for t in TYPES:
+    if i8:
+        w.add_tensor("blk.0.i8.weight", rng.integers(-128, 128, 33, dtype=np.int8))  # 33 bytes: padding to the alignment
+    for t in types:
         x = (rng.standard_normal((ROWS, COLS)) * 0.5).astype(np.float32)
         if t == Q.F32:
             w.add_tensor(f"blk.0.{t.name.lower()}.weight", x)
@@ -57,4 +58,6 @@ if __name__ == "__main__":
     os.makedirs(out, exist_ok=True)
     build(os.path.join(out, "tiny.gguf"), 32)
     build(os.path.join(out, "tiny-a64.gguf"), 64)
+    # only types gguf_convert_endian.py can byteswap (it refuses I8 and the K-less rest): the success case of convert-endian
+    build(os.path.join(out, "tiny-endian.gguf"), 32, [Q.F32, Q.F16, Q.BF16, Q.Q4_0, Q.Q8_0, Q.TQ2_0], False)
     print("wrote", out)

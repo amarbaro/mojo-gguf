@@ -3,8 +3,9 @@
 # (tools/mkfixture.py, written by the pinned gguf-py) against the pinned gguf-py scripts. No model, no llama.cpp build.
 #   tests/core-gate.sh    exit 0 only on PASS n/n
 # Rewrite: identical bytes on two fixtures (alignment 32 and 64), summary line equal to gguf-py's, two metadata edits
-# equal to gguf_new_metadata.py. Tool: dump (4 layouts), hash (2), set-metadata (2), convert-endian (2): stdout,
-# exit code and written bytes equal to the scripts'. Dequant: every row of the 8 types gguf-py can also dequantize,
+# equal to gguf_new_metadata.py. Tool: dump (4 layouts), hash (2), set-metadata (2), convert-endian (1 byteswap, 2 refused): stdout,
+# exit code and written bytes equal to the scripts'. Corrupt input: a truncated file is an exit 1 with a stderr message from
+# every command (EXP is the exit both must return); a both-tools-fail case expecting success is rejected. Dequant: every row of the 8 types gguf-py can also dequantize,
 # bit-equal to gguf-py.
 source "$(dirname "$0")/gate-lib.sh"
 check llama-cpp-pinned pinned
@@ -28,18 +29,6 @@ for f in tiny tiny-a64; do
   check "edit-$f" edit "$FX/$f.gguf" "edit-$f"
 done
 
-script() { case $1 in dump) echo gguf_dump.py;; hash) echo gguf_hash.py;; set-metadata) echo gguf_set_metadata.py;; convert-endian) echo gguf_convert_endian.py;; esac; }
-run_case() { # NAME SRC CMD ARGS...; "m.gguf" in ARGS is the working copy of SRC
-  local name=$1 src=$2; shift 2; local cmd=$1; shift
-  rm -rf "$W/$name"; mkdir -p "$W/$name/py" "$W/$name/mj"
-  cp "$src" "$W/$name/py/m.gguf"; cp "$src" "$W/$name/mj/m.gguf"
-  local rp=0 rm_=0
-  (cd "$W/$name/py" && env PYTHONPATH="$GGUFPY" "$PY" "$GGUFPY/gguf/scripts/$(script "$cmd")" "$@" > out 2> err <<< "${IN:-}") || rp=$?
-  (cd "$W/$name/mj" && "$W/gguf-tool" "$cmd" "$@" > out 2> err <<< "${IN:-}") || rm_=$?
-  [ "$rp" = "$rm_" ] || { echo "     $name: exit py $rp vs mojo $rm_"; return 1; }
-  cmp -s "$W/$name/py/out" "$W/$name/mj/out" || { echo "     $name: stdout differs: $(cmp "$W/$name/py/out" "$W/$name/mj/out" 2>&1 | head -1)"; return 1; }
-  cmp -s "$W/$name/py/m.gguf" "$W/$name/mj/m.gguf" || { echo "     $name: file differs"; return 1; }
-}
 T=$FX/tiny.gguf; A=$FX/tiny-a64.gguf
 check dump           run_case dump    "$T" dump m.gguf
 check dump-no-tensors run_case dump-nt "$A" dump --no-tensors m.gguf
@@ -48,9 +37,25 @@ check dump-markdown  run_case dump-md "$A" dump --markdown m.gguf
 check hash           run_case hash    "$T" hash m.gguf
 check hash-no-layer  run_case hash-nl "$A" hash --no-layer m.gguf
 check set-int        run_case set-int "$T" set-metadata m.gguf qwen2.context_length 8192 --force
-check set-missing    run_case set-miss "$T" set-metadata m.gguf no.such.key 1 --force
-IN=YES check endian-big-tiny run_case end-t "$T" convert-endian m.gguf big
-IN=YES check endian-big-a64  run_case end-a "$A" convert-endian m.gguf big
+EXP=1 check set-missing run_case set-miss "$T" set-metadata m.gguf no.such.key 1 --force
+# the fixtures hold an I8 tensor, which gguf_convert_endian.py refuses: both tools must refuse it (exit 1, a message);
+# the success case is a fixture of byteswappable types only
+IN=YES EXP=1 check endian-i8-refused-tiny run_case end-t "$T" convert-endian m.gguf big
+IN=YES EXP=1 check endian-i8-refused-a64  run_case end-a "$A" convert-endian m.gguf big
+IN=YES check endian-big-supported run_case end-s "$FX/tiny-endian.gguf" convert-endian m.gguf big
+
+# corrupt input: a truncated file (cut inside the tensor infos) must be an error exit with a message on every command,
+# from both tools; and a case where both tools fail alike must NOT pass as a success (negative control)
+head -c 400 "$FX/tiny.gguf" > "$FX/trunc.gguf"
+EXP=1 check dump-truncated        run_case dump-tr    "$FX/trunc.gguf" dump m.gguf
+EXP=1 check hash-truncated        run_case hash-tr    "$FX/trunc.gguf" hash m.gguf
+EXP=1 check set-truncated         run_case set-tr     "$FX/trunc.gguf" set-metadata m.gguf qwen2.context_length 8192 --force
+IN=YES EXP=1 check endian-truncated run_case end-tr   "$FX/trunc.gguf" convert-endian m.gguf big
+check mutant-both-fail-rejected   rejects run_case mut-tr "$FX/trunc.gguf" dump m.gguf
+errexit() { local rc=0; "$@" > "$W/errexit.err" 2>&1 || rc=$?;  # gguf-rewrite and gguf-dequant print their FAIL line on stdout
+  [ "$rc" = 1 ] && [ -s "$W/errexit.err" ]; }
+check rewrite-truncated errexit "$W/gguf-rewrite" "$FX/trunc.gguf" "$W/trunc.out"
+check dequant-truncated errexit "$W/gguf-dequant" "$FX/trunc.gguf" token_embd.weight 0 1 "$W/trunc.f32"
 
 deq() { "$PY" -I - "$GGUFPY" "$W/gguf-dequant" "$W" "$1" <<'PY'
 import subprocess, sys
