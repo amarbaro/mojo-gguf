@@ -50,7 +50,7 @@ def uint_at(g: Gguf, at: Int, n: Int) raises -> UInt64:
 def read_str(g: Gguf, at: Int) raises -> String:
     var n = Int(uint_at(g, at, 8))
     var b = peek(g, at + 8, n)
-    return String(unsafe_from_utf8=Span(b))
+    return String(from_utf8_lossy=Span(b))
 
 
 def end_at(g: Gguf, at: Int, t: Int) raises -> Int:

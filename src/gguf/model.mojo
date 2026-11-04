@@ -223,7 +223,7 @@ struct Gguf(Movable):
         self._need(n)
         var at = self.pos - self.wbase
         self.pos += n
-        return String(unsafe_from_utf8=Span(self.win)[at : at + n])
+        return String(from_utf8_lossy=Span(self.win)[at : at + n])
 
     def _skip(mut self, n: Int) raises:
         if n < 0 or self.pos + n > self.fsize:

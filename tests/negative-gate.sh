@@ -10,7 +10,7 @@ source "$(dirname "$0")/gate-lib.sh"
 check llama-cpp-pinned pinned
 W=$PWD/.work/neg; rm -rf "$W"; mkdir -p "$W"
 export LLAMACPP
-for t in gguf_rewrite:gguf-rewrite quantize:quantize; do
+for t in gguf_rewrite:gguf-rewrite quantize:quantize gguf_tool:gguf-tool ggml2gguf:ggml2gguf; do
   "$MOJO" build src/${t%%:*}.mojo -I src -o "$W/${t##*:}" > "$W/build-${t##*:}.log" 2>&1 || { echo "FAIL build: $W/build-${t##*:}.log"; exit 1; }
 done
 "$PY" tools/mkfloat.py "$W/float.gguf" > "$W/float.log" 2>&1 || { echo "FAIL fixture: $W/float.log"; exit 1; }
@@ -74,6 +74,20 @@ check st-lone-high        stcase hi    '{"a\ud800":{"dtype":"F32","shape":[2],"d
 check st-lone-low         stcase lo    '{"a\udc00":{"dtype":"F32","shape":[2],"data_offsets":[0,8]}}' 8 error
 check st-high-then-letter stcase hiu   '{"a\ud800\u0041":{"dtype":"F32","shape":[2],"data_offsets":[0,8]}}' 8 error
 check st-short-u-escape   stcase short '{"a\u12":{"dtype":"F32","shape":[2],"data_offsets":[0,8]}}' 8 error
+# strings from a file are not trusted to be UTF-8: a KV key, a KV value and a legacy-ggml tensor name holding 0xFF bytes come out
+# as U+FFFD (like gguf-core), so what the tools print is valid UTF-8 (gguf-py refuses these files outright)
+"$PY" -I -c 'import sys; b = open(sys.argv[1], "rb").read(); v = b"mojo-gguf-float"; k = b"general.architecture"
+open(sys.argv[2], "wb").write(b.replace(v, v[:4] + b"\xff\xfe" + v[6:], 1).replace(k, k[:3] + b"\xff" + k[4:], 1))' "$T" "$W/badutf.gguf"
+badutf_dump() { "$W/gguf-tool" dump "$W/badutf.gguf" > "$W/badutf.out" 2> "$W/badutf.err" || { echo "     dump failed: $(head -c 100 "$W/badutf.err")"; return 1; }
+  "$PY" -I -c 'import sys; sys.stdout.buffer.write(b""); open(sys.argv[1], "rb").read().decode("utf-8")' "$W/badutf.out" 2>/dev/null || { echo "     dump printed invalid UTF-8"; return 1; }; }
+check utf8-dump badutf_dump
+badutf_ggml() { local f=$MAIN/.work/oracle/ggml/ggjt3-f16.bin; [ -s "$f" ] || { echo "     $f missing (tools/mkoracle-ggml.sh)"; return 1; }
+  "$PY" -I -c 'import sys; b = open(sys.argv[1], "rb").read(); n = b"output.weight"; assert n in b; open(sys.argv[2], "wb").write(b.replace(n, b"out\xffut.weight", 1))' "$f" "$W/badname.bin" || return 1
+  # an unknown tensor name is refused (exit 1) and the refusal names it: that text must be valid UTF-8
+  local rc=0; "$W/ggml2gguf" --input "$W/badname.bin" --output "$W/badname.gguf" > "$W/badname.log" 2>&1 || rc=$?
+  [ "$rc" = 1 ] && grep -q "Bad name" "$W/badname.log" || { echo "     ggml2gguf exit $rc: $(tail -1 "$W/badname.log")"; return 1; }
+  "$PY" -I -c 'import sys; open(sys.argv[1], "rb").read().decode("utf-8")' "$W/badname.log" 2>/dev/null || { echo "     the refusal printed invalid UTF-8"; return 1; }; }
+check utf8-ggml2gguf badutf_ggml
 # the library's libc declarations must not clash with the stdlib's (FileHandle.seek declares lseek)
 check coexist-builds "$MOJO" build tests/coexist.mojo -I src -o "$W/coexist"
 coexist() { "$W/coexist" "$W/float.gguf" "$W/st-control/model.safetensors" | grep -q '^coexist: ok'; }

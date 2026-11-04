@@ -227,7 +227,7 @@ def read_legacy(mut src: Src) raises -> Legacy:
             dims.append(d)
             n_elems *= d
         var name_bytes = src.take(name_len)
-        var name = String(unsafe_from_utf8=Span(name_bytes))
+        var name = String(from_utf8_lossy=Span(name_bytes))
         if fmt == GGJT:
             src.skip(pad_to(src.pos, ALIGN) - src.pos)
         var nbytes = tensor_bytes(dtype, n_elems)
