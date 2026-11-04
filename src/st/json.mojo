@@ -40,6 +40,9 @@ struct Json(Movable):
         _ = external_call["close", Int32](fd)
 
     def ws(self, p: Int) -> Int:
+        """First non-space at or after p; past the end for the -1 of an absent key (a negative index would wrap)."""
+        if p < 0:
+            return len(self.b)
         var i = p
         while i < len(self.b) and is_space(self.b[i]):
             i += 1

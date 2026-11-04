@@ -48,4 +48,6 @@ check st-negative-lo stcase neglo    '{"a":{"dtype":"F32","shape":[2],"data_offs
 check st-reversed    stcase rev      '{"a":{"dtype":"F32","shape":[0],"data_offsets":[8,0]}}' 8 error
 check st-shape-size  stcase shape    '{"a":{"dtype":"F32","shape":[4],"data_offsets":[0,8]}}' 8 error
 check st-overflow    stcase ovf      '{"a":{"dtype":"F32","shape":[4294967296,4294967296],"data_offsets":[0,0]}}' 0 error
+check st-one-offset  stcase one      '{"a":{"dtype":"F32","shape":[2],"data_offsets":[5]}}' 8 error
+check st-one-offset-nl stcase onenl "{\"a\":{\"dtype\":\"F32\",\"shape\":[2],\"data_offsets\":[5]}}"$'\n' 8 error
 finish
