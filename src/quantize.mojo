@@ -192,7 +192,9 @@ def run() raises:
             pos.append(String(a[i]))
     if not pure or len(pos) < 3:
         raise Error("usage: quantize --pure IN OUT TYPE [NTHREADS] (only --pure is implemented)")
-    var nthreads = Int(pos[3]) if len(pos) > 3 else num_logical_cores()
+    var nthreads = Int(pos[3]) if len(pos) > 3 else 0
+    if nthreads < 1:  # llama-quantize: 0 or less means all cores
+        nthreads = num_logical_cores()
     refuse_same_file(pos[0], pos[1])
     var ft = parse_type(pos[2])
     var g = Gguf(pos[0])

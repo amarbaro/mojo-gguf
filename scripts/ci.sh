@@ -22,6 +22,7 @@ gate() { local name=$1; shift
   echo "ok   $name: $(tail -1 ".work/t/$name.log")"; }
 gate fixtures-ggml tools/mkoracle-ggml.sh
 gate core          tests/core-gate.sh
+gate negative      tests/negative-gate.sh
 gate cmp-selftest  tests/gguf-cmp-selftest.sh .work/core/fx/tiny.gguf
 gate u2            tests/u2-gate.sh
 gate u2-lookup     tests/u2-lookup-check.sh

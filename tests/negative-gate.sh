@@ -2,6 +2,7 @@
 # Hermetic negative gate (runs in scripts/ci.sh): inputs a tool must refuse or handle, on a synthetic float-only fixture (tools/mkfloat.py).
 #   tests/negative-gate.sh    exit 0 only on PASS n/n
 # gguf-rewrite and quantize with OUT the same file as IN (a hard link too): exit non-zero, IN untouched.
+# quantize NTHREADS 0 (llama-quantize: all cores): same bytes as an explicit count, tensors not left zero.
 source "$(dirname "$0")/gate-lib.sh"
 check llama-cpp-pinned pinned
 W=$PWD/.work/neg; rm -rf "$W"; mkdir -p "$W"
@@ -26,4 +27,10 @@ qsame() { local in=$1 out=$2; quant "$in" "$out"; }
 check quantize-same-file  refuses same qsame
 check quantize-hard-link  refuses link qsame
 
+nthreads() {
+  quant "$T" "$W/q2.gguf" 2 > "$W/q2.log" 2>&1 || return 1
+  quant "$T" "$W/q0.gguf" 0 > "$W/q0.log" 2>&1 || { echo "     nthreads 0: $(tail -1 "$W/q0.log")"; return 1; }
+  cmp -s "$W/q0.gguf" "$W/q2.gguf" || { echo "     nthreads 0 differs from 2: $(cmp "$W/q0.gguf" "$W/q2.gguf" 2>&1 | head -1)"; return 1; }
+}
+check quantize-nthreads-0 nthreads
 finish
