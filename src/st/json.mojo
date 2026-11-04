@@ -34,7 +34,7 @@ struct Json(Movable):
 
     def __init__(out self, path: String) raises:
         var fd = open_fd(path, 0)
-        var size = Int(external_call["lseek", Int](fd, Int64(0), Int32(2)))
+        var size = Int(external_call["lseek64", Int](fd, Int64(0), Int32(2)))
         self.b = List[UInt8](length=size, fill=0)
         pread_into(fd, self.b, 0, size, 0)
         _ = external_call["close", Int32](fd)

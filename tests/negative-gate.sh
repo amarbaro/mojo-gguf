@@ -3,6 +3,7 @@
 #   tests/negative-gate.sh    exit 0 only on PASS n/n
 # gguf-rewrite and quantize with OUT the same file as IN (a hard link too): exit non-zero, IN untouched.
 # Checkpoint: tensor entries with a negative or reversed offset, a shape that does not match the byte count, an overflowing shape, one offset.
+# coexist: a program that seeks a file and also links Gguf, Json and Shard builds and runs.
 # quantize NTHREADS 0 (llama-quantize: all cores): same bytes as an explicit count, tensors not left zero.
 source "$(dirname "$0")/gate-lib.sh"
 check llama-cpp-pinned pinned
@@ -50,4 +51,8 @@ check st-shape-size  stcase shape    '{"a":{"dtype":"F32","shape":[4],"data_offs
 check st-overflow    stcase ovf      '{"a":{"dtype":"F32","shape":[4294967296,4294967296],"data_offsets":[0,0]}}' 0 error
 check st-one-offset  stcase one      '{"a":{"dtype":"F32","shape":[2],"data_offsets":[5]}}' 8 error
 check st-one-offset-nl stcase onenl "{\"a\":{\"dtype\":\"F32\",\"shape\":[2],\"data_offsets\":[5]}}"$'\n' 8 error
+# the library's libc declarations must not clash with the stdlib's (FileHandle.seek declares lseek)
+check coexist-builds "$MOJO" build tests/coexist.mojo -I src -o "$W/coexist"
+coexist() { "$W/coexist" "$W/float.gguf" "$W/st-control/model.safetensors" | grep -q '^coexist: ok'; }
+check coexist-runs coexist
 finish

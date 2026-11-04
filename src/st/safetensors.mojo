@@ -35,7 +35,7 @@ struct Shard(Copyable, Movable):
     def __init__(out self, path: String) raises:
         var fd = open_fd(path, 0)
         self.path = path.copy()
-        self.size = Int(external_call["lseek", Int](fd, Int64(0), Int32(2)))
+        self.size = Int(external_call["lseek64", Int](fd, Int64(0), Int32(2)))
         # PROT_READ, MAP_PRIVATE
         self.base = external_call["mmap", Int](Int(0), self.size, Int32(1), Int32(2), fd, Int64(0))
         _ = external_call["close", Int32](fd)

@@ -140,7 +140,7 @@ struct Gguf(Movable):
 
     def __init__(out self, path: String) raises:
         self.fd = open_fd(path, 0)
-        self.fsize = Int(external_call["lseek", Int](self.fd, Int64(0), Int32(2)))
+        self.fsize = Int(external_call["lseek64", Int](self.fd, Int64(0), Int32(2)))
         self.win = List[UInt8](length=WINDOW, fill=0)
         self.wbase = 0
         self.wlen = 0
