@@ -91,6 +91,8 @@ struct Json(Movable):
         return i
 
     def _hex4(self, at: Int) raises -> Int:
+        if at + 4 > len(self.b):
+            raise Error("bad \\u escape at byte " + String(at))
         var v = 0
         for k in range(4):
             var c = Int(self.b[at + k])
@@ -141,9 +143,14 @@ struct Json(Movable):
             elif d == 117:
                 var cp = self._hex4(k)
                 k += 4
-                if cp >= 0xD800 and cp < 0xDC00 and self.b[k] == BACKSLASH and self.b[k + 1] == 117:
-                    cp = 0x10000 + ((cp - 0xD800) << 10) + (self._hex4(k + 2) - 0xDC00)
+                if cp >= 0xD800 and cp < 0xDC00:  # a high surrogate needs a \uDC00..\uDFFF right after it
+                    var lo = self._hex4(k + 2) if (self.b[k] == BACKSLASH and self.b[k + 1] == 117) else 0
+                    if lo < 0xDC00 or lo > 0xDFFF:
+                        raise Error("lone surrogate in a JSON string at byte " + String(k))
+                    cp = 0x10000 + ((cp - 0xD800) << 10) + (lo - 0xDC00)
                     k += 6
+                elif cp >= 0xDC00 and cp <= 0xDFFF:
+                    raise Error("lone surrogate in a JSON string at byte " + String(k))
                 push_utf8(out, cp)
             else:
                 raise Error("bad escape \\" + chr(d) + " at byte " + String(k))

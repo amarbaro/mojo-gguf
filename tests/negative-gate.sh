@@ -68,6 +68,12 @@ check st-shape-size  stcase shape    '{"a":{"dtype":"F32","shape":[4],"data_offs
 check st-overflow    stcase ovf      '{"a":{"dtype":"F32","shape":[4294967296,4294967296],"data_offsets":[0,0]}}' 0 error
 check st-one-offset  stcase one      '{"a":{"dtype":"F32","shape":[2],"data_offsets":[5]}}' 8 error
 check st-one-offset-nl stcase onenl "{\"a\":{\"dtype\":\"F32\",\"shape\":[2],\"data_offsets\":[5]}}"$'\n' 8 error
+# \u escapes in a tensor name: a surrogate pair decodes, a lone or mismatched surrogate and a cut-off escape are errors
+check st-surrogate-pair   stcase surp  '{"a\ud83d\ude00":{"dtype":"F32","shape":[2],"data_offsets":[0,8]}}' 8 ok
+check st-lone-high        stcase hi    '{"a\ud800":{"dtype":"F32","shape":[2],"data_offsets":[0,8]}}' 8 error
+check st-lone-low         stcase lo    '{"a\udc00":{"dtype":"F32","shape":[2],"data_offsets":[0,8]}}' 8 error
+check st-high-then-letter stcase hiu   '{"a\ud800\u0041":{"dtype":"F32","shape":[2],"data_offsets":[0,8]}}' 8 error
+check st-short-u-escape   stcase short '{"a\u12":{"dtype":"F32","shape":[2],"data_offsets":[0,8]}}' 8 error
 # the library's libc declarations must not clash with the stdlib's (FileHandle.seek declares lseek)
 check coexist-builds "$MOJO" build tests/coexist.mojo -I src -o "$W/coexist"
 coexist() { "$W/coexist" "$W/float.gguf" "$W/st-control/model.safetensors" | grep -q '^coexist: ok'; }
