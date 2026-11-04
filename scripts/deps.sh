@@ -11,5 +11,5 @@ while read -r pkg repo sha; do
     || { echo "FAIL setup: fetch $repo $sha"; exit 1; }
   mkdir -p lib && ln -s "../$d/src/$pkg" "lib/$pkg"
 done <<'PINS'
-uregex mojo-uregex 54282571241c1034c11458ca633fc07431353f4a
+uregex mojo-uregex 73218ba2e7b9730ddb4bdcec29e97da977cadded
 PINS
