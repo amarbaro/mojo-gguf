@@ -109,7 +109,9 @@ coexist() { "$W/coexist" "$W/float.gguf" "$W/st-control/model.safetensors" | gre
 check coexist-runs coexist
 # py_repr equals Python's repr for every code point (gguf-tool dump text output)
 "$MOJO" build tests/repr_all.mojo -I src -I lib -o "$W/repr_all" > "$W/build-repr_all.log" 2>&1 || { echo "FAIL build: $W/build-repr_all.log"; exit 1; }
-reprs() { "$W/repr_all" > "$W/repr.mojo" && "$PY" -I -c 'import sys; sys.stdout.reconfigure(encoding="utf-8")
+reprs() { local u; u=$(sed -n 's/^# source: Python [0-9.]*, Unicode \([0-9.]*\):.*/\1/p' src/ggufx/nonprint.mojo)
+  "$PY" -I -c 'import sys, unicodedata; v = unicodedata.unidata_version; v == sys.argv[1] or sys.exit(f"     oracle python has Unicode {v}, src/ggufx/nonprint.mojo was generated from {sys.argv[1]}")' "$u" || return 1
+  "$W/repr_all" > "$W/repr.mojo" && "$PY" -I -c 'import sys; sys.stdout.reconfigure(encoding="utf-8")
 for cp in range(0x110000):
     if not 0xD800 <= cp < 0xE000: print(repr(chr(cp)))' > "$W/repr.py" && cmp "$W/repr.py" "$W/repr.mojo"; }
 check py-repr-all-code-points reprs
