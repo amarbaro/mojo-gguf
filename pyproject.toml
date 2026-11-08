@@ -1,6 +1,6 @@
 [project]
 name = "mojo-gguf"
-version = "0.2.0"
+version = "0.2.1"
 description = "GGUF tooling in Mojo, byte-identical with llama.cpp's converters, quantizer and gguf-py scripts"
 license = "Apache-2.0"
 requires-python = ">=3.11,<3.15"

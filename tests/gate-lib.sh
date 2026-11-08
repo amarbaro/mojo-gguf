@@ -7,7 +7,7 @@ ORACLE=$MAIN/.work/oracle/qwen25-05b
 LLAMACPP=${LLAMACPP:-$MAIN/.work/llama.cpp}
 GGUFPY=$LLAMACPP/gguf-py
 PY=$MAIN/.venv/bin/python
-MOJO=$MAIN/.venv/bin/mojo
+MOJO=${MOJO:-$MAIN/.venv/bin/mojo}
 MODELS=${MODELS:-$HOME/Models}
 HF05=${QWEN_HF:-$MODELS/qwen2.5-0.5b-instruct-hf}
 fails=(); n=0

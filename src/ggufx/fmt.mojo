@@ -107,7 +107,7 @@ def py_repr(s: String) -> String:
         var step = 1 if cp < 0x80 else 2 if cp < 0x800 else 3 if cp < 0x10000 else 4
         if cp == 92:
             out += "\\\\"
-        elif cp == Int(ord(q)):
+        elif cp == Int(q.as_bytes()[0]):
             out += "\\" + q
         elif cp == 9:
             out += "\\t"
