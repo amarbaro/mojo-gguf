@@ -9,11 +9,12 @@ v=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml); c=$(sed -n 's/^- \[v\([
 [ "$v" = "$c" ] || { echo "FAIL version: pyproject $v vs newest CHANGELOG entry $c"; exit 1; }
 command -v uv >/dev/null || { echo "FAIL setup: uv not installed"; exit 1; }
 uv sync || { echo "FAIL setup: uv sync"; exit 1; }
+export MOJO="${MOJO:-.venv/bin/mojo}"
 scripts/deps.sh
 .venv/bin/python -c 'import platform; print("oracle python", platform.python_version())'
 scripts/fetch-llamacpp.sh || { echo "FAIL setup: scripts/fetch-llamacpp.sh"; exit 1; }
 mkdir -p .work/t
-M=.venv/bin/mojo
+M=$MOJO
 # every program builds; the ones a gate below does not build itself are built here
 for t in src/hf2gguf:hf2gguf src/quantize:quantize src/lora2gguf:lora2gguf src/hf_update:hf-update tools/type-census:type-census examples/quickstart:quickstart; do
   $M build -I src -I lib "${t%%:*}.mojo" -o ".work/t/${t##*:}" 2> .work/build.err || { echo "FAIL build: ${t%%:*}.mojo"; cat .work/build.err; exit 1; }
