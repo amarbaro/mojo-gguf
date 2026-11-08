@@ -20,7 +20,7 @@ for t in src/hf2gguf:hf2gguf src/quantize:quantize src/lora2gguf:lora2gguf src/h
 done
 gate() { local name=$1; shift
   "$@" > ".work/t/$name.log" 2>&1 || { echo "FAIL $name: $*"; tail -20 ".work/t/$name.log"; exit 1; }
-  tail -1 ".work/t/$name.log" | grep -q '^PASS' || { echo "FAIL $name: no PASS line at the end of .work/t/$name.log"; tail -5 ".work/t/$name.log"; exit 1; }
+  [[ $(tail -1 ".work/t/$name.log") == PASS* ]] || { echo "FAIL $name: no PASS line at the end of .work/t/$name.log"; tail -5 ".work/t/$name.log"; exit 1; }
   echo "ok   $name: $(tail -1 ".work/t/$name.log")"; }
 gate fixtures-ggml tools/mkoracle-ggml.sh
 gate core          tests/core-gate.sh

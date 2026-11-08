@@ -23,7 +23,7 @@ mkdir -p .work/oracle/u8 .work/t
 export U8_SUMMARY=$PWD/.work/oracle/u8/qwen-summary.txt
 gate() { local name=$1; shift
   "$@" > ".work/t/$name.log" 2>&1 || { echo "FAIL $name: $*"; tail -20 ".work/t/$name.log"; exit 1; }
-  tail -1 ".work/t/$name.log" | grep -q '^PASS' || { echo "FAIL $name: no PASS line at the end of .work/t/$name.log"; tail -5 ".work/t/$name.log"; exit 1; }
+  [[ $(tail -1 ".work/t/$name.log") == PASS* ]] || { echo "FAIL $name: no PASS line at the end of .work/t/$name.log"; tail -5 ".work/t/$name.log"; exit 1; }
   echo "ok   $name: $(tail -1 ".work/t/$name.log")"; }
 gate u1 tests/u1-gate.sh
 gate u3 tests/u3-gate.sh
