@@ -11,6 +11,9 @@ legacy-GGML converters, eight `llama-quantize --pure` types and a dequantizer fo
 compared with llama.cpp pinned at `1744c6bde`: converter and quantizer outputs are byte-identical on
 Qwen2.5-0.5B-Instruct, dequantized rows are bit-equal to `ggml`'s `to_float`. Linux x86-64, CPU only.
 
+Install: `pixi workspace channel add https://conda.modular.com/max https://prefix.dev/amarbaro/amarbaro`, then `pixi add mojo-gguf` (import `ggufx`). From source: `git clone https://github.com/amarbaro/mojo-gguf`, then `mojo run -I mojo-gguf/src app.mojo`.
+Toolchains: Mojo 1.2 stable, and the nightly 1.3.0.dev2026110805 in the weekly [mojo-libs](https://github.com/amarbaro/mojo-libs) matrix (36 libraries on stable, 35 on nightly).
+
 ```mojo
 from ggufx import Gguf
 
