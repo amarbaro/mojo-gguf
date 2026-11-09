@@ -8,7 +8,7 @@ from std.sys import num_logical_cores
 comptime Task = def(Int, Int) thin -> None
 
 @fieldwise_init
-struct _Job:
+struct _Job(Copyable):
     var task: Task
     var ctx: Int
     var next: Pointer[Int64, MutUntrackedOrigin]
@@ -29,8 +29,8 @@ def parallelize(task: Task, ctx: Int, items: Int, nthreads: Int = 0):
             task(ctx, i)
         return
     var counter = List[Int64](length=1, fill=0)
-    var job = _Job(task, ctx, Pointer[Int64, MutUntrackedOrigin](unsafe_from_address=Int(counter.unsafe_ptr())), items)
-    var jp = Int(Pointer(to=job))
+    var job: List[_Job] = [_Job(task, ctx, Pointer[Int64, MutUntrackedOrigin](unsafe_from_address=Int(counter.unsafe_ptr())), items)]
+    var jp = Int(job.unsafe_ptr())  # heap: a stack slot can be reused before the threads read it
     var tids = List[UInt64](length=n - 1, fill=0)
     var started = 0
     for t in range(n - 1):
@@ -40,4 +40,4 @@ def parallelize(task: Task, ctx: Int, items: Int, nthreads: Int = 0):
     _ = _run(jp)  # the caller works too, so a failed pthread_create only costs speed
     for t in range(started):
         _ = external_call["pthread_join", Int32](tids[t], Int(0))
-    _ = len(counter) + job.items
+    _ = len(counter) + len(job)

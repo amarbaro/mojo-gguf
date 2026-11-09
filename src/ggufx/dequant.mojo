@@ -443,7 +443,7 @@ def deq_span(t: Int, s: Src, y: Dst, n: Int, nb: Int, rb: Int, ne0: Int):
                 deq_tq1_0(sr, yr, nb)
 
 @fieldwise_init
-struct _Span:
+struct _Span(Copyable):
     var src: Src
     var dst: Dst
     var t: Int
@@ -471,6 +471,6 @@ def deq_rows(t: Int, src: Src, ne0: Int, nrows: Int, dst: Dst) raises:
     var items = min(nrows, 256)
     if items <= 0:
         return
-    var c = _Span(src, dst, t, nb, rb, ne0, nrows, items)
-    parallelize(_deq_task, Int(Pointer(to=c)), items)
-    _ = c.items
+    var c: List[_Span] = [_Span(src, dst, t, nb, rb, ne0, nrows, items)]  # heap ctx: a stack slot can die before the threads read it
+    parallelize(_deq_task, Int(c.unsafe_ptr()), items)
+    _ = len(c)

@@ -128,7 +128,7 @@ def load_row(t: Int, src: BP, at: Int, ne0: Int, dst: FP):
             dst[unsafe_offset=i] = Float32(bitcast[DType.float16](UInt16(v)))
 
 @fieldwise_init
-struct _Rows:
+struct _Rows(Copyable):
     var src: Int
     var dst: Int
     var st: Int
@@ -167,9 +167,9 @@ def quantize_tensor(fd: Int32, ofd: Int32, p: Plan, out_at: Int, nthreads: Int) 
         var nr = min(step, p.nrows - r0)
         pread_into(fd, sbuf, 0, nr * src_row, p.src_off + r0 * src_row)
         var items = min(nr, nthreads * 8)
-        var c = _Rows(Int(sp), Int(dp), st, dt, ne0, nr, items, src_row, dst_row)
-        parallelize(_quant_task, Int(Pointer(to=c)), items, nthreads)
-        _ = c.items
+        var c: List[_Rows] = [_Rows(Int(sp), Int(dp), st, dt, ne0, nr, items, src_row, dst_row)]  # heap ctx, see dequant.deq_rows
+        parallelize(_quant_task, Int(c.unsafe_ptr()), items, nthreads)
+        _ = len(c)
         pwrite_all(ofd, dbuf, nr * dst_row, out_at + r0 * dst_row)
 
 def copy_tensor(fd: Int32, ofd: Int32, src_off: Int, n: Int, out_at: Int) raises:
